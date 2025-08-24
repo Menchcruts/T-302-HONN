@@ -1,0 +1,52 @@
+Software Architecture (40 points)
+In this part you need to give clear answers to questions related to software architecture. All answers need to
+be fully justified.
+
+1. (Total points: 10) Explain in you own words what you think Software Architecture is and what the
+architect’s role is. Don’t necessarily just say what is mentioned in the lectures, use your own words
+and understanding, full marks will be given for an honest attempt.
+
+At first, I thought software architecture was the practice of designing and sometimes programming software.
+However, after the lecture, I realize that this statement is only partially true. A better description of software architecture is that it is 
+the practice of designing the high-level structure of a software system. Where the term “high level” is pretty abstract and often refers to the overall
+organization of a system, including its components, their relationships, and key design decisions. Think of high level as the "important stuff" of a system
+which is exactly part of the role of an architect, being able to identify what is and is not imporant in the design of a system. In general the architect's 
+role is to design a system and has to take all the important decisions before the actual construction of a system begins, examples of these choices are sometimes 
+which arcitecture or framework to use. Often times architects also take the role of being the programmer and vice versa. Every programmer needs to understand 
+the skeleton of the system they work on and there is no better way to understand it than actually being the designer of said system.
+
+2. (Total points: 10) Why is a good and well thought out software architecture important?
+A good and well-thought-out software architecture matters because it determines not only if a system “works,” but also whether the system is maintainable, scalable, 
+stable, secure, and most importantly, deployable. The better and more well-thought-out the software architecture, the fewer problems you will have to deal with 
+later in the development process of a system. In other words, the software is less likely to become a “big ball of mud,” which is essentially a sloppy and unstructured 
+system in constant need of repair, rework, and refactoring. A good architecture also lets teams work in parallel instead of having the whole team rely on only one person. 
+It also makes it easier for new developers to get into the system without too much effort, which could otherwise lead to discouragement or even a person not wanting to work on said system.
+
+3. (Total points: 10) Give two examples about trade-offs in software architecture that architects might
+need to decide on, justify your answer.
+
+An example of a trade-off would be deciding if you want a system to "work" in as little time as possible which could lead to problems in the future
+or carefully planing and executing a maintainable structure which does not need a whole bunch of reworking in the future, however with the cost of 
+a late deployment which can sometimes be detrimental to a company. Another example is an architect may need to choose between a monolithic and a 
+microservices architecture. A monolith is simpler to develop and deploy initially but becomes harder to scale and maintain as the system grows. 
+Microservices allow better scalability and independent deployments, but they add complexity in communication, monitoring, and operations. 
+
+
+Info: These trade-offs don’t necessarily need to be architectural characteristics, they only need
+to be some architecturally significant factor(if it isn’t clear what makes the factor architecturally
+significant then justify your answer)
+
+
+4. (Total points: 5) Why is it important that the architect works in a close relationship with the pro-
+grammers and follows and monitors the code that is produced?
+
+It is important for the architect to work closely with programmers because they need to understand what the team is capable of achieving. 
+An architecture that is unrealistic given the team’s skills, size, or experience can lead to major problems in the future. Close collaboration allows
+programmers to provide feedback, suggest improvements, and help identify potential problems early, before they become major issues.
+
+
+5. (Total points: 5) Name one example about an architectural guideline and one example about an architectural rule.
+An example of an Architectural rule is that the presentation layer must not communicate directly with the persistence layer, 
+this enforces separation of concerns, ensuring that all data access goes through a controlled layer, which improves maintainability and consistency.
+An example of an Architectural guideline is, using asynchronous messaging between services to improve performance,
+this is recommended to increase scalability and responsiveness, though it is not required and can is adaptable based on the system's needs.
