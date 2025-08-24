@@ -16,10 +16,20 @@ which arcitecture or framework to use. Often times architects also take the role
 the skeleton of the system they work on and there is no better way to understand it than actually being the designer of said system.
 
 2. (Total points: 10) Why is a good and well thought out software architecture important?
-
+A good and well-thought-out software architecture matters because it determines not only if a system “works,” but also whether the system is maintainable, scalable, 
+stable, secure, and most importantly, deployable. The better and more well-thought-out the software architecture, the fewer problems you will have to deal with 
+later in the development process of a system. In other words, the software is less likely to become a “big ball of mud,” which is essentially a sloppy and unstructured 
+system in constant need of repair, rework, and refactoring. A good architecture also lets teams work in parallel instead of having the whole team rely on only one person. 
+It also makes it easier for new developers to get into the system without too much effort, which could otherwise lead to discouragement or even a person not wanting to work on said system.
 
 3. (Total points: 10) Give two examples about trade-offs in software architecture that architects might
 need to decide on, justify your answer.
+
+An example of a trade-off would be deciding if you want a system to "work" in as little time as possible which could lead to problems in the future
+or carefully planing and executing a maintainable structure which does not need a whole bunch of reworking in the future, however with the cost of 
+a late deployment which can sometimes be detrimental to a company. Another example is an architect may need to choose between a monolithic and a 
+microservices architecture. A monolith is simpler to develop and deploy initially but becomes harder to scale and maintain as the system grows. 
+Microservices allow better scalability and independent deployments, but they add complexity in communication, monitoring, and operations. 
 
 
 Info: These trade-offs don’t necessarily need to be architectural characteristics, they only need
@@ -29,8 +39,12 @@ significant then justify your answer)
 
 4. (Total points: 5) Why is it important that the architect works in a close relationship with the pro-
 grammers and follows and monitors the code that is produced?
+It is important for the architect to work closely with programmers because they need to understand what the team is capable of achieving. 
+An architecture that is unrealistic given the team’s skills, size, or experience can lead to major problems in the future. Close collaboration allows
+programmers to provide feedback, suggest improvements, and help identify potential problems early, before they become major issues.
 
 
-5. (Total points: 5) Name one example about an architectural guideline and one example about an
-architectural rule.
-2
+
+5. (Total points: 5) Name one example about an architectural guideline and one example about an architectural rule.
+An example of an Architectural rule is, that the presentation layer must not communicate directly with the persistence layer. 
+An example of an Architectural guideline is, using asynchronous messaging between services to improve performance.
