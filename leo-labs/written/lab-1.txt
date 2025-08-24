@@ -39,12 +39,14 @@ significant then justify your answer)
 
 4. (Total points: 5) Why is it important that the architect works in a close relationship with the pro-
 grammers and follows and monitors the code that is produced?
+
 It is important for the architect to work closely with programmers because they need to understand what the team is capable of achieving. 
 An architecture that is unrealistic given the team’s skills, size, or experience can lead to major problems in the future. Close collaboration allows
 programmers to provide feedback, suggest improvements, and help identify potential problems early, before they become major issues.
 
 
-
 5. (Total points: 5) Name one example about an architectural guideline and one example about an architectural rule.
-An example of an Architectural rule is, that the presentation layer must not communicate directly with the persistence layer. 
-An example of an Architectural guideline is, using asynchronous messaging between services to improve performance.
+An example of an Architectural rule is that the presentation layer must not communicate directly with the persistence layer, 
+this enforces separation of concerns, ensuring that all data access goes through a controlled layer, which improves maintainability and consistency.
+An example of an Architectural guideline is, using asynchronous messaging between services to improve performance,
+this is recommended to increase scalability and responsiveness, though it is not required and can is adaptable based on the system's needs.
