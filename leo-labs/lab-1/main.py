@@ -10,4 +10,6 @@ for logger in loggers:
     logger.log_info('this is an info message')
     logger.log_warning('this is a warning')
     logger.log_error('this is a an error', Exception('some weird exception'))
+    
+
 

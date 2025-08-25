@@ -60,7 +60,6 @@ class DatabaseLogger(Logger):
         self.conn.commit()
 
     def __del__(self):
-        print("Closing")
         self.__close()
 
     def __close(self) -> None:

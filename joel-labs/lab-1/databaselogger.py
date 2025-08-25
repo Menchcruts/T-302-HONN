@@ -61,8 +61,8 @@ class DatabaseLogger(Logger):
 
     def __del__(self):
         print("Closing")
-        self.__close()
+        self.close()
 
-    def __close(self) -> None:
+    def close(self) -> None:
         self.cur.close()
         self.conn.close()
