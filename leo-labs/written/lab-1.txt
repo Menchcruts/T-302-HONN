@@ -37,8 +37,7 @@ to be some architecturally significant factor(if it isn’t clear what makes the
 significant then justify your answer)
 
 
-4. (Total points: 5) Why is it important that the architect works in a close relationship with the pro-
-grammers and follows and monitors the code that is produced?
+4. (Total points: 5) Why is it important that the architect works in a close relationship with the programmers and follows and monitors the code that is produced?
 
 It is important for the architect to work closely with programmers because they need to understand what the team is capable of achieving. 
 An architecture that is unrealistic given the team’s skills, size, or experience can lead to major problems in the future. Close collaboration allows
