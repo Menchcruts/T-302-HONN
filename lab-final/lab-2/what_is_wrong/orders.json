@@ -1,0 +1,9 @@
+[
+    {
+        "merchant_username": "eggo",
+        "buyer_username": "Eleven",
+        "price": 12,
+        "product": "Eggo",
+        "description": "some description"
+    }
+]

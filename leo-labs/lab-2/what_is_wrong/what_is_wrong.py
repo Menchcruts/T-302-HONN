@@ -23,6 +23,11 @@ class Order:
     product: str
     description: str
 
+class OrderData:
+    price: float
+    product: str
+    description: str
+
 
 class ApplicationException(Exception):
     pass
