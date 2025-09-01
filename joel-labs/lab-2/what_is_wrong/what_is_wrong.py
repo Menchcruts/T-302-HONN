@@ -117,9 +117,12 @@ def get_merchant(username: str) -> Buyer:
     except StopIteration:
         raise EntityNotFound("merchant", username)
 
-
-def is_valid_product(product:str, merchant: Merchant, buyer: Buyer) -> bool:
+def can_buy_product(product:str, merchant: Merchant, buyer: Buyer) -> bool:
     return product in buyer.allowed_products and merchant.product == product
+
+def validate_product(product:str, merchant: Merchant, buyer: Buyer) -> None:
+    if not can_buy_product(product=product, merchant=merchant, buyer=buyer):
+        raise ApplicationException(f"Product {product} not allowed for buyer {buyer.username} and merchant {merchant.username}")
 
 
 def get_existing_orders() -> List[dict]:
@@ -148,18 +151,15 @@ def create_order(merchant_username: str, buyer_username: str, order_info: OrderI
     buyer = get_buyer(buyer_username)
     merchant = get_merchant(merchant_username)
     
-    if is_valid_product(order_info.product, merchant, buyer):
-        order = Order(
+    validate_product(order_info.product, merchant, buyer)
+    order = Order(
             merchant_username=merchant.username,
             buyer_username=buyer.username,
             price=order_info.price,
             product=order_info.product,
             description=order_info.description
         )
-        save_order(order)
-    else:
-        raise ApplicationException(f"Product {order_info.product} not allowed for buyer {buyer.username} and merchant {merchant.username}")
-
+    save_order(order)
 
 if __name__ == '__main__':
     create_order("eggo", "Eleven", OrderInfo("Eggo", 12, "some description"))
