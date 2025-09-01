@@ -13,16 +13,16 @@ class CustomerDebtService:
     def __init__(self) -> None:
         self.__fakeCustomers = [Customer(1, 2), Customer(2, 3), Customer(3, 4)]
 
-    def get_debt_of_customer(self, id: str) -> float | None:
+    def get_debt_of_customer(self, id: str) -> float:
         try:
             customer = self.__get_customer(id)
             if customer.debt is None:
                 return 0.0
             return customer.debt
         except StopIteration:
-            raise CustomerNotFoundException
+            raise CustomerNotFoundException()
 
-    def set_debt_of_customer(self, id: str, debt: float) -> bool:
+    def set_debt_of_customer(self, id: str, debt: float) -> None:
         try:
             customer = self.__get_customer(id)
             customer.debt = debt
