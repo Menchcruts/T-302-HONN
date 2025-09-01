@@ -1,0 +1,131 @@
+1.1 Command Query Separation (15 points)
+
+1. (Total points: 5) In the following example you can find a few violations of some of the clean code
+guidelines, one of them is the Command Query separation guideline, state where this violation takes
+place and explain.
+
+def set_debt_of_customer(self, id: str, debt: float) -> bool:
+    try:
+        customer = self.__get_customer(id)
+        customer.debt = debt
+        return True
+    except StopIteration:
+        return False
+
+This code is a violation of the Command Query separation guideline as it states that a function 
+should do something like modify state or return data, but not both. Here this function is returning a boolean
+indicating if the state modification worked, that is a violation as it is doing two things.
+
+2. (Total points: 5) You can find the class in the code skeleton folder under the name customer_debt_service.py,
+change the code to adhere to the command query separation principle by throwing a CustomerNotFoundException
+instead.
+
+See code in customer_debt_service.py
+
+3. (Total points: 5) By making the change in the earlier problem, what other clean code guideline are
+you now adhering to? What are the pros and cons of this change.
+
+By making the change in the earlier problem we adhere to the clean code guideline “Prefer Exceptions to Returning Error Codes.”
+The pros of this are that it improves decoupling by separating the action from the error handling, makes the code more readable, 
+and makes it easier to catch and errors. The cons are that it introduces a risk of unhandled exceptions if the caller does not 
+properly catch them and it can sometimes make the flow of the program less clear compared to returning a simple value.
+
+1.2 Don’t Return Null (10 points)
+1. (Total points: 5) In the same problem as above you can also find a function that returns None, what
+are the major problems that can occur by returning None / Null ?
+
+The major problems that can occur by returning None/Null are that it first of all makes the code less readable,
+since the caller has to remember to check for it and if the caller forgets to handle the None case, it can lead to runtime 
+errors like NullPointerException which is the most common uncaught error. Returning None can also hide the real intent of the function
+since it is unclear whether None means “not found,” “error,” or simply “no value,” which makes the code harder to understand.
+
+2. (Total points: 5) Change the code to return 0 instead if no debt is registered for a given customer.
+See code in customer_debt_service.py
+
+1.3 What is wrong? (45 points)
+1. (Total points: 15) In the code below there a few things that go against clean code, name all the
+problems and explain.
+
+def get_breads(user_name_str:str):
+    bro = fetch_user(user_name_str)
+    save_user(bro)
+    return bro.b4s
+
+First of all it breaks the rule of "Don’t be cute" as "bro" is not choosing clarity over entertainment value.
+Secondly the rule of "Avoid disinformation" it states that it is not good to have the type of the variable in the name.
+get_breads is not descriptive at all. What is breads and the clean code principle of a funciton name should decribe what
+the function does or returns is broken here. The return of get_breads is not very "Pronouncable" we have no idea what b4s is.
+"Use Searchable Names" is not very clear either as the names in this function are not at all descriptive.
+The function does two unrelated things save_user(bro) is a side effect that is unrelated to the function name get_breads.
+This function is both a accessor and a mutator, it is getting/fetching the user but also saving the user, which is most
+likely some kind of mutation. The Command Query Sepetation is also broken because of this.
+
+2. (Total points: 30) In the code that you can find in the what_is_wrong folder in the code_skeleton
+there are things that go against clean code
+(a) (Total points: 15) Name the problems and explain.
+First of all create_order has way to many arguments, this breaks the rule of "Function arguments" as it states the less the better.
+The function name is not very clear after reading what the function does as it does many things and function names should describe 
+clearly what the function does. The parameter names are also not clear, username_1 and username_2 do not tell us who the buyer and 
+the merchant is. The function violates the single responsibility principle as the does so many things, it with this also violates the
+Command Query Sepetation principle. There also better ways to handle the files using with open(...) as file. Also there is inconsistent naming
+some names are file1, data1 and some names are like username_1. The variable names are also very unclear, what is data1 and data2 the names 
+could definitely be more descriptive. Another rule break was of the "One Level of Abstraction per Function" clean code rule as there are multiple levels
+mixed in one function like there was high level logic like checking if the order is valid and creating a Order object and mid level logic by fetching
+merchant and buyer from data and low level like reading and writing JSON all in one function.
+
+
+(b) (Total points: 15) Change the code so that it becomes clean.
+see what_is_wrong.py
+
+2 Design Principles (30 points)
+Give short but concise descriptions of the design patterns when asked, explain what each principle is
+all about and the motivation behind it
+
+2.1 Rule of Three (15 points)
+
+1. (Total points: 5) Shortly explain Rule of three
+
+The Rule of Three is a guideline that says you should not create an abstraction until you have seen the same code repeated three times. 
+If you have code duplicated under three times it is usually just simpler to have it that way. 
+
+2. (Total points: 5) Compare DRY and rule of three.
+
+DRY (Dont Repeat Yourself) says to try to repeat as little as possible and find abstractions for repeated code. However this is the complete opposite of the
+rule of three. The reason for DRY is it is easier to maintain code and is often easier to read, however the bad thing is if you abstract 
+too early and it turns out that that abstraction was bad, then you have a code that is hard to maintain, read and overly complicated. A good 
+rule of thumb is to use the rule of three first, then DRY.
+
+3. (Total points: 5) In the following example EmailSender was first created alongside the MessagingSender
+interface, next came the SmsSender and the AppNotificationSender, explain why this is a violation
+of the rule of three.
+
+In this case we have three classes that use the send_message abstract method, so at first glance this is a good use of the rule of three because
+we are repeating the same function three times. However if you look at the code under each class you can see that this is a bad abstraction, the three classes use the send_message
+function in three different ways. One of them uses all the arguments, another three and the last one only two. The rule of three states that if you have repeated code three times
+then you should make an abstraction, however in this instance it isnt even repeated three times, its like the abstraction is forced. The fule of three also states that a bad abstraction
+is often worse than repeated code. This abstraction is overgeneralized and therefore it is just better to just drop the abstraction.
+
+2.2 Knuth’s Optimization Principle (5 points)
+Explain why we want to wait to make our code faster / more optimized
+
+We often dont want to sacrifice readability for a small amount of optimization. As most optimizations give little to no value. If we are talking about a 
+huge optimization on a system that needs it, then sure, but that is not the case, it is better to have the code readable and clear so it is easier to maintain in the future. 
+
+2.3 KISS (5 points)
+Explain how the use of design patterns and principles can adhere to KISS but can also lead the the violation
+of it.
+
+KISS states that you should make everything as simple as possible, but no simpler than that. Many design patterns and principles can fall on either side of this
+for example the Single Responsibility Principle (SRP) states that a class should only have one reason to change, therefore keeping this class simple therefore
+adhereing to Kiss. Open/Closed Principle (OCP) which states that software entities should be open for extension but closed for modification, this can sometimes 
+break kiss because OCP can often require extra layers of abstraction even for small or simple problems. The same thing does for DRY as if you follow it too 
+strictly you can be abstracting code when it is simpler to repeat it (rule of three).
+
+2.4 Loosely Coupled Design (5 points)
+What does it mean to be loosely coupled and why is it important in Software Architecture and Implemen-
+tation.
+
+To be loosely coupled means that components know as little as possible about each other and know only how to communicate with the interface 
+of the other components without making assumptions or knowing how the component works on the inside. This is good because the system and its components
+are more flexible and dont rely too much on one another and that makes it easier to reuse the classes in different scenarios. Loose coupling also makes classes
+easier to change because they shouldnt effect the other classes. This also makes the system easier to test because you can test each class for itself. 

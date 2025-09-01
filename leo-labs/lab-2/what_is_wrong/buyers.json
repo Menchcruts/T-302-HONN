@@ -1,0 +1,22 @@
+[
+    {
+        "username": "Dustin",
+        "allowed_products": [
+            "Cocoa Puffs",
+            "Lucky Charms",
+            "Frosted Flakes"
+        ]
+    },
+    {
+        "username": "Mike",
+        "allowed_products": [
+            "Trix"
+        ]
+    },
+    {
+        "username": "Eleven",
+        "allowed_products": [
+            "Eggo"
+        ]
+    }
+]

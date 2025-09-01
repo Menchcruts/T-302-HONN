@@ -1,0 +1,27 @@
+[
+    {
+        "username": "Sonny",
+        "name": "Sonny the Cuckoo Bird",
+        "product": "Cocoa Puffs"
+    },
+    {
+        "username": "tony",
+        "name": "Tony The Tiger",
+        "product": "Frosted Flakes"
+    },
+    {
+        "username": "lucky",
+        "name": "Lucky the Leprechaun",
+        "product": "Lucky Charms"
+    },
+    {
+        "username": "trix",
+        "name": "Trix the Rabbit",
+        "product": "Trix"
+    },
+    {
+        "username": "eggo",
+        "name": "The Eggo Man",
+        "product": "Eggo"
+    }
+]
