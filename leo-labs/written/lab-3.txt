@@ -1,0 +1,147 @@
+Leó Sakamoto Kolbeinsson
+Jóel Arnar Sævarsson
+
+1 Design Principles (40 points)
+Give short but concise descriptions of the design patterns when asked, explain what each principle is
+all about and the motivation behind it
+
+
+1.1 Law of Demeter (10 points)
+
+1. (Total points: 3) Shortly explain Law of Demeter and it’s motive
+The Law of Demeter states that classes should know as little as possible about other classes and should have information about as few classes as possible.
+“Don’t talk to strangers” is another part of the Law of Demeter, which states that classes should only communicate with classes that are their close friends. 
+This means if class A is a friend of B (related in functionality) and B is a friend of C but not of A, then A should not talk to C.
+Law of Demeter helps with loose coupling and makes code more maintainable and easier to test.
+
+
+2. (Total points: 3) What is the main drawback of Law of Demeter
+Sometimes the Law of Demeter can cause unnecessary overhead because there can be instances when there is a class B (a bridge between A and C) that has to make 
+a wrapper function with the sole purpose of calling C so A can call C. When it would of course be less overhead to make A call C.
+
+
+3. (Total points: 4) Here you can see an image of the ShapeRender class which has the function
+draw_circle which creates the circle object and draws said object.
+
+(a) (Total points: 2) Why is this technically a violation of Law of Demeter?
+
+This is technically a violation because what we are essentially doing is self.__shape_factory.CreateCircle().draw() so we are reaching from a 
+class A through B all the way to C, which is technically a violation here.
+
+(b) (Total points: 2) despite technically being a violation of Law of Demeter, why is this a very mild
+violation and why should this not be "fixed" to conform to the Law of Demeter?
+
+This is a very mild violation because the Circle object returned by the factory is meant to be used directly. 
+If we tried to “fix” it, we would only add unnecessary overhead by making a wrapper function in ShapeFactory (like we mentioned above as the drawback of LoD)
+that creates and draws the circle, which would not improve maintainability or reduce coupling in any meaningful way.
+
+
+1.2 SOLID (10 points)
+
+1. Shortly explain all the SOLID principles and their motives
+(a) (Total points: 2) Single Responsibility Principle
+The main motive behind the Single Responsibility Principle is that a class should have only one reason to change, as if it has more then one
+reason to change then it has more than one responsibility. SRP helps with decoupling and makes classes more reusable.
+
+(b) (Total points: 2) Open-Closed Principle
+The Open-Closed Principle states that entities should be open for extension but not for modification. This is because changes can break classes
+and by using the Open-Closed Principle we can extend classes instead of modifying them. The key point is "New code not changed code".
+
+(c) (Total points: 2) Liskov Substitution Principle
+The Liskov Substitution Principle states that subtypes must be substitutable for their base types, so if we have a ancestor object and change it 
+to a descendant object then the program should still work. 
+
+(d) (Total points: 2)  
+The Interface Segregation Principle states that clients should not be forced to depend on methods they do not use. Large interfaces are sometimes 
+implemented across many clients, but some clients only need a subset of the methods. ISP suggests splitting such interfaces into smaller, more 
+specific ones so that clients only depend on the methods they actually use.
+
+(e) (Total points: 2) Dependency Inversion Principle
+The Dependency Inversion Principle states that high-level modules should not depend on low-level modules but both should depend on abstractions.
+When HLC depend on LLC then when the LLC changes it has an effect on the HLC. It should be that the HLC should have an effect on the LLC as they 
+define the business logic. The High and Low-level components should just both depend on the same abstraction. DIP also states that abstractions should 
+not depend on details but the other way around. 
+
+
+1.3 Identify the violation (20 stig)
+In this part you should identify the design principle violations which occur in each example and
+suggest a way to fix the violations
+
+1. (Total points: 5)
+(a) (Total points: 2.5) what are the violations on the image below? Explain
+Law of Demeter:
+OrderService.submit_order reaches through the repository to its internal connection and calls commit():
+self.__order_repository.connection.commit(). That’s talking to a “stranger.”
+Single Responsibility Principle:
+OrderService mixes business orchestration with transaction management by calling commit().
+
+
+(b) (Total points: 2.5) How would you fix the violations?
+Add this method self.__order_repository.commit() to the __order_repository. Law of Demeter is now respected, 
+since OrderService no longer reaches into the repository’s internals (connection). Also the Single Responsibility 
+Principle is respected, since transaction management is owned by the repository instead of being mixed into the service.
+
+2. (Total points: 5)
+(a) (Total points: 2.5) What are the violations on the image below? Explain
+Liskov Substitution Principle:
+This violates the Liskov Substitution Principle because a Penguin cannot be used everywhere a Bird is expected. 
+The Bird interface guarantees a fly() method, but Penguin breaks this guarantee by raising an error.
+Interface Segregation Principle:
+This states that that clients should not be forced to depend on methods they do not use. This is not the case as here we are forcing the Penguin
+to depend on the fly method.
+
+(b) (Total points: 2.5) How can you fix the violation but still use inheritance? (that is don’t fix the
+violation using composition)
+
+from abc import ABC, abstractmethod
+
+class Bird(ABC):
+    @abstractmethod
+    def lay_egg(self):
+        pass
+
+class FlyingBird(Bird):
+    @abstractmethod
+    def fly(self):
+        pass
+
+class SwimmingBird(Bird):
+    @abstractmethod
+    def swim(self):
+        pass
+
+class Penguin(SwimmingBird):
+    def lay_egg(self):
+        print("laying a penguin egg")
+    def swim(self):
+        print("swim swim")
+
+With this, the Penguin class doesn’t need to forcefully implement the fly() method and instead 
+inherits from the specific bird type that only includes the behaviors that make sense for it.
+
+3. (Total points: 10 / 20 with bonus)
+(a) (Total points: 5) what are the violations on the image below? Explain:
+
+Open–Closed Principle (OCP):
+ShipmentService.ship() switches on package.shipment_type and instantiates concrete classes so 
+every time you add a new transport, you must modify this method and add another elif, breaking OCP.
+
+Single Responsibility Principle:
+ShipmentService is selecting which transport type to use, handling the shipping preparation logic
+(fuel oil, jet fuel, gas, eat seeds) and actually shipping the package. It has three responsibilities or three reasons to change.
+
+Dependency Inversion Principle:
+The Dependency Inversion Principle states that high-level modules should not depend on low-level modules but both should depend 
+on abstractions. Here, the high-level module is heavily depending on the low-level modules instead of abstractions. 
+For example, shipment_type.ship and shipment_type.plane each have their own methods that are not based on a common abstraction, even though they are very similar.
+
+(b) (Total points: 5) how would you fix the violations?
+Create an abstraction called Transport that defines two methods, prepare() and deliver(). Each transportation type would inherit from this abstraction and implement
+those methods. This allows the ShipmentService class to remain very simple, depending only on the abstraction. It can call prepare() and deliver() without caring 
+about the concrete type, which eliminates the need for conditionals and ensures that new transport types can be added without modifying ShipmentService. This makes 
+the ShipmentService class follow DIP because it now depends only on the abstraction. It also follows SRP since its sole responsibility is managing the shipment
+process, and it follows OCP because new shipment types can be added without modifying the existing code.
+
+(c) (Total points: 10) Bonus Fix the violation and return the code as a part of the zip hand-in file,
+the code in the image can be found in the skeleton code that follows the lab description.
+See the 1.3.3_bonus_code_skeleton.py file.
