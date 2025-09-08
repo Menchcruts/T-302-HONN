@@ -165,10 +165,11 @@ system is easily extensible.
 
 2.2 The Decorator Pattern (20 points)
 2.2.1 (Total points: 15) Weather Station continued
-See decorator_skeleton implementation.
+See implementation under decorator_skeleton.
 
 
 2.2.2 (Total points: 5) Open-Closed
-Explain why the biggest motivation behind these changes is the Open-Closed principle.
-
+The biggest motivation is the Open-Closed Principle, which states that classes should be open for extension but closed for modification. 
+With the decorator pattern, we can add new responsibilities by creating decorators that wrap existing classes. This way, we extend functionality 
+without altering tested, existing code.
 
