@@ -1,0 +1,62 @@
+Leó Sakamoto Kolbeinsson
+Jóel Arnar Sævarsson
+
+1 The Factory Pattern (50 points)
+1.1 (Total points: 30) Pizza Store python implementation
+Implement the last version of the PizzaStore application in the Factory chapter in the Head First Design
+Patterns book, that is to say with the IngredientFactory and with the Template Method, the skeleton
+for this implementation can be found in factory_skeleton
+
+See implementation in factory_skeleton
+
+1.2 (Total points 10) Problems with the PizzaStore
+There are a couple of things wrong with the PizzaStore implementation that could be done better that
+were done for simplicities sake and to more easily show the Factory Pattern
+What it wrong and how could you fix it ?
+
+They made create_pizza() abstract in order to clearly demonstrate the Factory Method pattern, but in practice that introduces duplication because
+Both NYPizzaStore and ChicagoPizzaStore have very similar create_pizza() implementations. The only real difference is which IngredientFactory they use.
+It would be easier if we just ditched the factory method and had PizzaStore implement the create_pizza method that just needed to take in an IngerdientFactory.
+
+1.3 (Total points 10) TemplateMethod
+In this example / solution you can also find the Template Method pattern, explain where you can find
+that pattern and how it is the Template Method pattern.
+
+The Template Method pattern is found in the orderPizza() method of PizzaStore. This method defines the "algorithm" for processing a pizza:
+Create the pizza (createPizza), Prepare it, Bake it, Cut it and finally Box it. The subclasses (like NYPizzaStore, ChicagoPizzaStore) only customize the createPizza step,
+but the overall algorithm is fixed by orderPizza(). 
+
+
+2 The Command Pattern (50 points)
+2.1 (Total points: 10) Validation
+On the diagram below you can see somewhat of a framework for validations, explain how the diagram
+below is in fact the command pattern
+
+The Command Pattern encapsulates a request for an operation as an object. This lets you change one command for another, and the caller has no idea that the implementation has changed.
+Here we have validation objects (MerchantAllowsModificationsValidation, OrderIsUnpaidValidation, BuyerHasAgreedToTermsValidation), which act as command objects implementing the Validation interface.
+The Validation interface defines a validate() method. Each concrete validation calls methods on its receiver (for example, the Buyer with has_agreed_to_terms()).
+The Invoker (Validator) does not know the details of these operations only knows it needs to call validate() on each command.
+
+2.2 (Total points: 25 points) Validation Implementation
+Implement the diagram above, all you need to get started can be found in the command_skeleton.
+
+See implementation in command_skeleton.
+
+2.3 (Total points: 7.5) Simple Factory
+There is a place in the skeleton that would be good to replace with a Simple Factory, where is that place and
+what object creation should we be encapsulating? Be clear in exactly what code we would encapsulate
+
+The object creation we would encapsulate is the manual instantiation and configuration of validation objects, i.e. this part of the code:
+validator = Validator()
+validator.add_validation(MerchantAllowsModificationsValidation(order.merchant))
+validator.add_validation(BuyerHasAgreedToTermsValidation(order.buyer))
+validator.add_validation(OrderIsUnpaidValidation(order))
+We would encapsulate a ValidationFactory that takes an Order object and returns a fully configured Validator with
+all necessary validations already added. This would replace the manual creation of each validation object.
+The factory would encapsulate how to construct each validation object from the order data.
+
+2.4 (Total points: 7.5) A Second Pattern
+In this example there is another pattern that isn’t the Command pattern, name that pattern and explain.
+
+We can argue that the Composite Pattern is here because each validation acts as a leaf, while the Validator adds them into a collection and represents the composite. 
+To the client the Validator can be treated as just another Validation but internally it is delegating to many validations.
