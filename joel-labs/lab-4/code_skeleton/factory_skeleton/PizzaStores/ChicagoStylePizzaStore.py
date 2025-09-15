@@ -12,9 +12,6 @@ class ChicagoStylePizzaStore(PizzaStore):
         self._IngredientFactory = ChicagoPizzaIngredientFactory()
         self._name = "Chicago"
     
-    def order_pizza(self, pizza_type):
-        return super().order_pizza(pizza_type)
-
     def create_pizza(self, pizza_type):
         pizza = None
         match pizza_type:

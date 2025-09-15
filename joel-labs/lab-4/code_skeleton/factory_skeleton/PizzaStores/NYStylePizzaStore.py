@@ -13,14 +13,11 @@ class NYStylePizzaStore(PizzaStore):
         self._IngredientFactory = NYPizzaIngredientFactory()
         self._name = "New York"
     
-    def order_pizza(self, pizza_type):
-        return super().order_pizza(pizza_type)
-    
     def create_pizza(self, pizza_type):
         pizza = None
         match pizza_type:
             case PizzaType.CHEESE:
-                pizza = CheesePizza(self._PizzaFactory, self._name)
+                pizza = CheesePizza(self._IngredientFactory, self._name)
             case PizzaType.PEPPERONI:
                 pizza = PepperoniPizza(self._IngredientFactory, self._name)
             case PizzaType.CLAM:
