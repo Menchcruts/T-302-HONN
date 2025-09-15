@@ -1,0 +1,4 @@
+
+
+class BuyerHasAgreedToTermsValidation:
+    pass

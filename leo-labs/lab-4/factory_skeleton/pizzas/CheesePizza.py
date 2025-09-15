@@ -1,0 +1,6 @@
+
+
+class CheesePizza:
+    pass
+
+
