@@ -1,0 +1,6 @@
+1. (Total points: 5) If the system would be multi threaded then there would be a problem with our implementation, explain what the problem is.
+Using a singleton sqlite3.Connection in multiple threads causes concurrency bugs: with SQLite the default check_same_thread=True
+raises exceptions if a connection is used across threads; even if disabled, concurrent use can lead to "database is locked."
+Similar races can hit the JSON file repo, leading to torn writes, and any shared in-memory structures (e.g., dicts/lists).
+
+2. (Total points: 5) How would you fix this problem? Name two different method of resolving the problem and explain.

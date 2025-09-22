@@ -1,0 +1,15 @@
+Leó Sakamoto Kolbeinsson
+Jóel Arnar Sævarsson
+
+1. (Total points: 5) If the system would be multi threaded then there would be a problem with our implementation, explain what the problem is.
+Using a singleton sqlite3.Connection in multiple threads causes concurrency bugs. Specifically, because the implementation uses SQLite, it could raise exceptions if a 
+connection is trying to edit while another connection hasn't commited. 
+Similar races can hit the JSON file repo, leading to torn writes, and any shared in memory structures, like lists or dicts.
+
+2. (Total points: 5) How would you fix this problem? Name two different method of resolving the problem and explain.
+Fix 1:
+Threads could have their own local singleton connection. This means classes in a thread will have a unique singleton instance.
+The Injector framework even supports this with threadlocal.
+
+Fix 2:
+Have save_entry and get_entry lock the connection. This means any other thread trying to save or get will have to wait for other threads to finish.
