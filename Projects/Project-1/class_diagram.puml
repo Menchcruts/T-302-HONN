@@ -1,4 +1,4 @@
-@startuml
+@startuml Project1
 title T-302-HONN • Project 1 — Structured Logging + Client Integration (from code_skeleton)
 
 skinparam packageStyle rectangle
