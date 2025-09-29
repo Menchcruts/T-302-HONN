@@ -1,0 +1,252 @@
+@startuml
+title T-302-HONN • Project 1 — Structured Logging + Client Integration (from code_skeleton)
+
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+
+' =========================
+' STRUCTURED LOGGING
+' =========================
+package "structured_logging" {
+  package "sinks" {
+    interface ISink {
+      +sink_data(data: dict): void
+    }
+
+    ' To be implemented by you
+    class ConsoleSink implements ISink
+    class FileSink implements ISink {
+      -file_path: str
+      +FileSink(file_path: str)
+      +sink_data(data: dict): void
+    }
+  }
+
+  package "processors" {
+    interface IProcessor {
+      +set_next(processor: IProcessor): void
+      +handle(data: dict): dict
+    }
+
+    ' Recommended abstract base to realize CoR + Template Method
+    abstract class AbstractProcessor implements IProcessor {
+      -next: IProcessor
+      +set_next(processor: IProcessor): void
+      +handle(data: dict): dict   ' template method: do_process + delegate to next
+      #do_process(data: dict): dict
+    }
+
+    class NullProcessor extends AbstractProcessor
+    class TimestampProcessor extends AbstractProcessor
+    class EnvironmentProcessor extends AbstractProcessor {
+      -environment: str
+      +EnvironmentProcessor(env: str)
+    }
+  }
+
+  package "configuration" {
+    class LoggerConfig {
+      +sink: sinks.ISink
+      +processor: processors.IProcessor
+      +is_async: bool
+      +async_wait_delay_in_seconds: int
+    }
+
+    enum Environment {
+      DEVELOPMENT
+      STAGING
+      PRODUCTION
+    }
+  }
+
+  package "logger_creation" {
+    class LoggerConfigBuilder {
+      -_sink: sinks.ISink
+      -_processor: processors.IProcessor
+      -_is_async: bool
+      -_async_wait_delay_in_seconds: int
+      +with_custom_sink(sink: sinks.ISink): LoggerConfigBuilder
+      +with_file_sink(file_path: str): LoggerConfigBuilder
+      +as_async(wait_delay_in_seconds: int): LoggerConfigBuilder
+      +add_environment(environment: configuration.Environment): LoggerConfigBuilder
+      +add_processor(processor: processors.IProcessor): LoggerConfigBuilder
+      +build(): configuration.LoggerConfig
+      -_clear(): void
+    }
+
+    class LoggerFactory {
+      +create_logger(logger_config: configuration.LoggerConfig): logger.Logger
+    }
+  }
+
+  package "command_queue" {
+    abstract class Command {
+      +execute(): void
+    }
+
+    ' You implement this
+    class LoggingCommand extends Command {
+      -sink: sinks.ISink
+      -data: dict
+      +LoggingCommand(sink: sinks.ISink, data: dict)
+      +execute(): void
+    }
+
+    class Queue {
+      -__thread: Thread
+      -__commands: List<Command> ' or queue.Queue
+      -__delay_s: int
+      +Queue(delay_s: int)
+      +add(command: Command): void
+      -__process(): void
+    }
+  }
+
+  package "logger" {
+    class Logger {
+      -__logger_config: configuration.LoggerConfig
+      -__logging_queue: command_queue.Queue
+      +Logger(logger_config: configuration.LoggerConfig, logging_queue: command_queue.Queue)
+      +log(**kwargs): void
+    }
+  }
+
+  package "infrastructure" {
+    class AppModule {
+      -__logger_config: configuration.LoggerConfig
+      +AppModule(logger_config: configuration.LoggerConfig)
+    }
+  }
+}
+
+' Relationships (framework)
+structured_logging.logger.Logger --> structured_logging.configuration.LoggerConfig : uses
+structured_logging.logger.Logger --> structured_logging.command_queue.Queue : uses
+structured_logging.logger.Logger --> structured_logging.processors.IProcessor : runs chain
+structured_logging.logger.Logger --> structured_logging.sinks.ISink : targets sink via command
+
+structured_logging.command_queue.LoggingCommand --> structured_logging.sinks.ISink : writes
+structured_logging.command_queue.Queue --> structured_logging.command_queue.Command : processes *
+structured_logging.logger_creation.LoggerConfigBuilder --> structured_logging.configuration.LoggerConfig : build()
+structured_logging.logger_creation.LoggerFactory ..> structured_logging.logger.Logger : creates
+
+' Strategy for sinks
+structured_logging.sinks.ISink <|.. structured_logging.sinks.ConsoleSink
+structured_logging.sinks.ISink <|.. structured_logging.sinks.FileSink
+
+' CoR + Template Method for processors
+structured_logging.processors.IProcessor <|.. structured_logging.processors.AbstractProcessor
+structured_logging.processors.AbstractProcessor <|-- structured_logging.processors.NullProcessor
+structured_logging.processors.AbstractProcessor <|-- structured_logging.processors.TimestampProcessor
+structured_logging.processors.AbstractProcessor <|-- structured_logging.processors.EnvironmentProcessor
+
+' Command pattern
+structured_logging.command_queue.Command <|-- structured_logging.command_queue.LoggingCommand
+
+' =========================
+' CLIENT SIDE
+' =========================
+package "client" {
+  package "infrastructure.logging" {
+    interface ILogger {
+      +error(message: str, exception: Exception=None): void
+      +warning(message: str, exception: Exception=None): void
+      +info(message: str): void
+    }
+
+    ' Adapter you will implement to connect ILogger to framework Logger
+    class ClientLoggerAdapter implements ILogger {
+      -_logger: structured_logging.logger.Logger
+      +ClientLoggerAdapter(logger: structured_logging.logger.Logger)
+      +error(message: str, exception: Exception=None): void
+      +warning(message: str, exception: Exception=None): void
+      +info(message: str): void
+      ' Bonus: +log_object(obj: Any): void
+    }
+
+    class LoggerConfigFactory {
+      +create_logger_config(settings: infrastructure.settings.Settings, builder: structured_logging.logger_creation.LoggerConfigBuilder): structured_logging.configuration.LoggerConfig
+    }
+  }
+
+  package "infrastructure.settings" {
+    class Settings {
+      +order_file_path: str
+      +should_payment_succeed: bool
+      +logging_type: LoggingType
+      +logging_file_path: str
+      +logging_is_async: bool
+      +logging_async_delay: int
+      +environment: Environment
+    }
+
+    enum LoggingType {
+      CONSOLE
+      FILE
+    }
+
+    enum Environment {
+      DEVELOPMENT
+      STAGING
+      PRODUCTION
+    }
+  }
+
+  package "infrastructure.dependency_injection" {
+    class AppModule {
+      -__settings: infrastructure.settings.Settings
+      +AppModule(settings: infrastructure.settings.Settings)
+    }
+  }
+
+  package "models" {
+    class Order {
+      +description: str
+      +payment: Payment
+    }
+    class Payment {
+      +card_number: str
+      +expiration_date: str
+      +security_code: str
+      +card_holder: str
+      +amount: float
+    }
+  }
+
+  package "repositories" {
+    class OrderRepository {
+      -__settings: infrastructure.settings.Settings
+      +save(order: models.Order): void
+    }
+  }
+
+  package "services" {
+    class PaymentServiceStub {
+      -__logger: infrastructure.logging.ILogger
+      -__settings: infrastructure.settings.Settings
+      +pay(payment: models.Payment): void
+    }
+
+    class OrderService {
+      -__payment_service: PaymentServiceStub
+      -__order_repository: repositories.OrderRepository
+      -__logger: infrastructure.logging.ILogger
+      +place_order(order: models.Order): void
+    }
+  }
+}
+
+' Relationships (client)
+client.infrastructure.dependency_injection.AppModule --> client.infrastructure.settings.Settings : uses
+client.repositories.OrderRepository --> client.infrastructure.settings.Settings : uses
+client.services.PaymentServiceStub --> client.infrastructure.logging.ILogger : logs via
+client.services.PaymentServiceStub --> client.infrastructure.settings.Settings : uses
+client.services.OrderService --> client.infrastructure.logging.ILogger : logs via
+client.services.OrderService --> client.services.PaymentServiceStub
+client.services.OrderService --> client.repositories.OrderRepository
+
+' Adapter wiring
+client.infrastructure.logging.ClientLoggerAdapter --> structured_logging.logger.Logger : adapts to
+client.infrastructure.logging.LoggerConfigFactory --> structured_logging.configuration.LoggerConfig : creates
+
+@enduml
