@@ -1,0 +1,3 @@
+from structured_logging.sinks.i_sink import ISink
+
+class FileSink(ISink): ...

@@ -1,0 +1,3 @@
+from structured_logging.processors.i_processor import IProcessor
+
+class TimestampProcessor(IProcessor): ...
