@@ -11,13 +11,14 @@ class FileSink(ISink):
         self.path.parent.mkdir(exist_ok=True, parents=True)
 
     def get_data(self) -> list[dict]:
-        data = []
-        with self.path.open("a+", encoding="utf-8") as file:
-            try:
+        if not self.path.exists():
+            return []
+        try:
+            with self.path.open("r", encoding="utf-8") as file:
                 data = json.load(file)
-            except json.decoder.JSONDecodeError as e:
-                pass
-        return data
+                return data if isinstance(data, list) else []
+        except (json.JSONDecodeError, FileNotFoundError):
+            return []
     
     def save_data(self, data: list[dict]) -> None:
         with self.path.open("w+", encoding="utf-8") as file:
