@@ -1,11 +1,11 @@
 from structured_logging.command_queue.command import Command
-from sinks.i_sink import ISink
+from structured_logging.sinks.i_sink import ISink
 
 class LoggerCommand(Command):
     def __init__(self, sink: ISink, data: dict):
-        self.sink = sink
-        self.data = data
+        self.__sink = sink
+        self.__data = data
 
     def execute(self):
-        self.sink.sink_data(self.data)
+        self.__sink.sink_data(self.__data)
         
