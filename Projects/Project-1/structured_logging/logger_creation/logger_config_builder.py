@@ -14,7 +14,7 @@ class LoggerConfigBuilder:
     __sink: ISink
     __processors: list[IProcessor]
     __is_async: bool
-    __async_wait_delay_in_seconds: int
+    __async_wait_delay_in_seconds: float
     __environment: Environment
 
     def __init__(self):
@@ -33,7 +33,7 @@ class LoggerConfigBuilder:
         self.__sink = ConsoleSink()
         return self
 
-    def as_async(self, wait_delay_in_seconds: int) -> 'LoggerConfigBuilder':
+    def as_async(self, wait_delay_in_seconds: float) -> 'LoggerConfigBuilder':
         self.__is_async = True
         self.__async_wait_delay_in_seconds = wait_delay_in_seconds
         return self

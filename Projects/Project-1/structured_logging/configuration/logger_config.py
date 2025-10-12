@@ -7,4 +7,4 @@ class LoggerConfig(BaseSettings):
     sink: ISink
     processor: IProcessor
     is_async: bool
-    async_wait_delay_in_seconds: int
+    async_wait_delay_in_seconds: float
