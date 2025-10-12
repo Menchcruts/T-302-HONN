@@ -32,11 +32,9 @@ class Queue:
                     command.execute()
                     self.__commands.task_done()
             except Empty as e:
-                pass
+                time.sleep(self.__async_wait_delay)
             except Exception as e:
                 print(f"Queue: Error processing command. | {e}", flush=True)
-
-            time.sleep(self.__async_wait_delay)
 
     def join(self):
         self.__commands.join()

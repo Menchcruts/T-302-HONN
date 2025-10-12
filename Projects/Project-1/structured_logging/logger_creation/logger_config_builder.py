@@ -3,6 +3,7 @@ from structured_logging.configuration.logger_config import LoggerConfig
 
 from structured_logging.processors.i_processor import IProcessor
 from structured_logging.processors.null_processor import NullProcessor
+from structured_logging.processors.environment_processor import EnvironmentProcessor
 
 from structured_logging.sinks.i_sink import ISink
 from structured_logging.sinks.file_sink import FileSink
@@ -15,7 +16,6 @@ class LoggerConfigBuilder:
     __processors: list[IProcessor]
     __is_async: bool
     __async_wait_delay_in_seconds: float
-    __environment: Environment
 
     def __init__(self):
         self._clear()
@@ -39,8 +39,8 @@ class LoggerConfigBuilder:
         return self
 
     def add_environment(self, environment: Environment) -> 'LoggerConfigBuilder':
-        assert isinstance(environment, Environment)
-        self.__environment = environment
+        # assert isinstance(environment, Environment)
+        self.add_processor(EnvironmentProcessor(environment))
         return self
 
     def add_processor(self, processor: IProcessor) -> 'LoggerConfigBuilder':
@@ -53,7 +53,6 @@ class LoggerConfigBuilder:
         self.__processors = [NullProcessor()]
         self.__is_async = False
         self.__async_wait_delay_in_seconds = 0
-        self.__environment = None   # Used for what?
 
     def __build_processor(self) -> IProcessor:
         last: IProcessor = None
