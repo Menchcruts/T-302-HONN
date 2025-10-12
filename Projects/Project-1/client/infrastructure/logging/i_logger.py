@@ -3,13 +3,10 @@ from abc import ABC, abstractmethod
 
 class ILogger(ABC):
     @abstractmethod
-    def error(self, message: str, exception: Exception = None):
-        pass
+    def error(self, data: str | object, exception: Exception = None): ...
 
     @abstractmethod
-    def warning(self, message: str, exception: Exception = None):
-        pass
+    def warning(self, data: str | object, exception: Exception = None): ...
 
     @abstractmethod
-    def info(self, message: str):
-        pass
+    def info(self, data: str | object): ...

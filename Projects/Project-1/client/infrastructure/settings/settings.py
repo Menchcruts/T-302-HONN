@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 from pydantic import BaseSettings
 
 
@@ -26,6 +27,7 @@ class Settings(BaseSettings):
     logging_is_async: bool
     logging_async_delay: int
     environment: Environment
+    masked_keys: List[str]
 
     class Config:
         env_file = "./client/infrastructure/settings/.env"
