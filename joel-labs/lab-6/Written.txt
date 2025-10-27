@@ -1,0 +1,9 @@
+Leó Sakamoto Kolbeinsson
+Jóel Arnar Sævarsson
+
+1.3 Bonus (10 points)
+One of the known problems with N-Tier architecture shines through very strongly in this project, what is that problem? Explain.
+
+The N-Tier sinkhole anti-pattern is when all layers are thin wrappers for the database and the service layer provides no real extra logic.
+For example in movie_service.py, all MovieService does is wrap the methods get_all and create_movie for the MovieRepository without doing anything else.
+This can also be seen in all the other services.
