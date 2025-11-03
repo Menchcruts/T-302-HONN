@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM python:3.12.11-slim-trixie
+FROM python:3.8-slim-buster
 
 WORKDIR /app
 
