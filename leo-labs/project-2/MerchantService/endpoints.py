@@ -1,0 +1,53 @@
+from container import Container
+from dependency_injector.wiring import Provide, inject
+from fastapi import APIRouter, Depends, Response
+from merchant_repository import MerchantRepository
+from merchant_inputmodel import MerchantInputModel
+from merchant_dto import MerchantDto
+
+router = APIRouter()
+
+
+@router.get("/merchants/{id}", status_code=200)
+@inject
+async def get_merchant(
+    id: int,
+    merchant_repository: MerchantRepository = Depends(
+        Provide[Container.merchant_repository_provider]
+    )
+):
+    merchant = merchant_repository.get_merchant(id=id)
+
+    if not merchant:
+        resp = Response(
+            content="Merchant not found",
+            status_code=404
+        )
+        return resp
+    
+    merchant_dto = MerchantDto(
+        name=merchant[0],
+        ssn=merchant[1],
+        email=merchant[2],
+        phoneNumber=merchant[3],
+        allowsDiscount=merchant[4]
+    )
+    return merchant_dto
+
+
+@router.post("/merchants", status_code=201)
+@inject
+async def save_merchant(
+    merchant: MerchantInputModel,
+    merchant_repository: MerchantRepository = Depends(
+        Provide[Container.merchant_repository_provider]
+    ),
+):
+    created_id = merchant_repository.save_merchant(merchant)
+
+    resp = Response(
+        content=str(created_id),
+        status_code=201,
+        headers={"Location": f"/merchants/{created_id}"}
+    )
+    return resp

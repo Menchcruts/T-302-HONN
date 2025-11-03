@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class MerchantDTO:
+class MerchantDto:
     name: str
     ssn: str
     email: str

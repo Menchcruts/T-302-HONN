@@ -1,10 +1,9 @@
-import json
-
 from container import Container
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, Response
 from merchant_repository import MerchantRepository
-from models.merchant_model import MerchantModel
+from merchant_inputmodel import MerchantInputModel
+from merchant_dto import MerchantDto
 
 router = APIRouter()
 
@@ -25,21 +24,25 @@ async def get_merchant(
             status_code=404
         )
         return resp
-        
-    return merchant
+    
+    merchant_dto = MerchantDto(
+        name=merchant[0],
+        ssn=merchant[1],
+        email=merchant[2],
+        phoneNumber=merchant[3],
+        allowsDiscount=merchant[4]
+    )
+    return merchant_dto
 
 
 @router.post("/merchants", status_code=201)
 @inject
 async def save_merchant(
-    merchant: MerchantModel,
+    merchant: MerchantInputModel,
     merchant_repository: MerchantRepository = Depends(
         Provide[Container.merchant_repository_provider]
     ),
 ):
-    json_data = merchant.json()
-    data = json.loads(json_data)
-
     created_id = merchant_repository.save_merchant(merchant)
 
     resp = Response(

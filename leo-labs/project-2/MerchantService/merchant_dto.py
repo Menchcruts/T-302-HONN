@@ -2,9 +2,9 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Merchant:
+class MerchantDto:
     name: str
     ssn: str
     email: str
     phoneNumber: str
-    allowsDiscout: bool
+    allowsDiscount: bool
