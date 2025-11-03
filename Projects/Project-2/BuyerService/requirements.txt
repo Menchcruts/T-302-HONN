@@ -2,3 +2,4 @@ psycopg2-binary
 fastapi>=0.111.0
 dependency-injector==4.48.2
 pika==1.2.0
+uvicorn==0.15.0

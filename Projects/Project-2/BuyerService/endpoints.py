@@ -3,8 +3,9 @@ import json
 from container import Container
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, Response
-from repo.buyer_repository import BuyerRepository
-from models.input.buyer import Buyer
+from buyer_repository import BuyerRepository
+from buyer_inputmodel import BuyerInputModel
+from buyer_dto import BuyerDTO
 
 router = APIRouter()
 
@@ -26,20 +27,24 @@ async def get_buyer(
         )
         return resp
     
-    return buyer
+    buyer_dto = BuyerDTO(
+        name=buyer[0],
+        ssn=buyer[1],
+        email=buyer[2],
+        phoneNumber=buyer[3]
+    )
+
+    return buyer_dto
 
 
 @router.post("/buyers", status_code=201)
 @inject
 async def save_buyer(
-    buyer: Buyer,
+    buyer: BuyerInputModel,
     buyer_repository: BuyerRepository = Depends(
         Provide[Container.buyer_repository_provider]
     ),
 ):
-    json_data = buyer.json()
-    data = json.loads(json_data)
-
     created_id = buyer_repository.save_buyer(buyer)
 
     resp = Response(

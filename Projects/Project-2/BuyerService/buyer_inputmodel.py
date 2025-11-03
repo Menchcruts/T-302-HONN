@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Buyer:
+class BuyerInputModel:
     name: str
     ssn: str
     email: str
