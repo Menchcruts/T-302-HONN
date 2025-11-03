@@ -10,10 +10,12 @@ def get_connection():
 
 
 def callback(ch, method, properties, body: bytes):
+    print("Printing message...")
     print(body.decode(encoding="utf-8"), flush=True)
 
 
 def main():
+    print("Running")
     queue = "messages"
     conn = get_connection()
     channel = conn.channel()

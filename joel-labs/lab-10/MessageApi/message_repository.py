@@ -26,7 +26,7 @@ class MessageRepository:
         create_table_query = f"""
         CREATE TABLE IF NOT EXISTS {self.table_name} (
             id SERIAL PRIMARY KEY,
-            message VARCHAR NOT NULL,
+            message VARCHAR NOT NULL
         )
         """
         self.cur.execute(create_table_query)
@@ -42,7 +42,7 @@ class MessageRepository:
         
 
     def get_message(self, id: int) -> str:
-        select_query = f"SELECT FROM {self.table_name} message WHERE id={id}"
+        select_query = f"SELECT message FROM {self.table_name} WHERE id={id}"
         self.cur.execute(select_query)
         msg = self.cur.fetchone()
         return msg[0]
