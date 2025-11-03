@@ -8,8 +8,31 @@ services:
     
     container_name: order-service
 
+    profiles:
+      - orders
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    environment:
+      - POSTGRES_DB=${POSTGRES_ORDERS_DB}
+      - POSTGRES_USER=${POSTGRES_ORDERS_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_ORDERS_PASS}
+      
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+
     ports:
-      - "8000:8000"
+      - "${ORDERS_PORT}:8000"
+
+    restart: "unless-stopped"
+    command: [
+      "python", "-m", "uvicorn",
+      "startup:app",
+      "--host", "0.0.0.0",
+      "--port", "8000"
+    ]
 
   merchant-service:
     build:
@@ -18,8 +41,31 @@ services:
       
     container_name: merchant-service
 
+    profiles:
+      - merchant
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+        
+    environment:
+      - POSTGRES_DB=${POSTGRES_MERCHANTS_DB}
+      - POSTGRES_USER=${POSTGRES_MERCHANTS_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_MERCHANTS_PASS}
+
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+
     ports:
-      - "8001:8001"
+      - "${MERCHANTS_PORT}:8000"
+
+    restart: "unless-stopped"
+    command: [
+      "python", "-m", "uvicorn",
+      "startup:app",
+      "--host", "0.0.0.0",
+      "--port", "8000"
+    ]
 
   buyer-service:
     build:
@@ -28,8 +74,31 @@ services:
       
     container_name: buyer-service
 
+    profiles:
+      - buyer
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    environment:
+      - POSTGRES_DB=${POSTGRES_BUYERS_DB}
+      - POSTGRES_USER=${POSTGRES_BUYERS_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_BUYERS_PASS}
+
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+
     ports:
-      - "8002:8002"
+      - "${BUYERS_PORT}:8000"
+
+    restart: "unless-stopped"
+    command: [
+      "python", "-m", "uvicorn",
+      "startup:app",
+      "--host", "0.0.0.0",
+      "--port", "8000"
+    ]
 
   inventory-service:
     build:
@@ -38,8 +107,31 @@ services:
       
     container_name: inventory-service
 
+    profiles:
+      - inventory
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    environment:
+      - POSTGRES_DB=${POSTGRES_INVENTORY_DB}
+      - POSTGRES_USER=${POSTGRES_INVENTORY_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_INVENTORY_PASS}
+
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+
     ports:
-      - "8003:8003"
+      - "${INVENTORY_PORT}:8000"
+
+    restart: "unless-stopped"
+    command: [
+      "python", "-m", "uvicorn",
+      "startup:app",
+      "--host", "0.0.0.0",
+      "--port", "8000"
+    ]
 
   payment-service:
     build:
@@ -47,6 +139,32 @@ services:
       dockerfile: Dockerfile
       
     container_name: payment-service
+
+    profiles:
+      - payment
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    environment:
+      - POSTGRES_DB=${POSTGRES_PAYMENTS_DB}
+      - POSTGRES_USER=${POSTGRES_PAYMENTS_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PAYMENTS_PASS}
+
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+
+    ports:
+      - "${PAYMENTS_PORT}:8000"
+
+    restart: "unless-stopped"
+    command: [
+      "python", "-m", "uvicorn",
+      "startup:app",
+      "--host", "0.0.0.0",
+      "--port", "8000"
+    ]
 
   email-service:
     build:
@@ -85,11 +203,11 @@ services:
 
   postgres:
     image: postgres:latest
-    container_name: lab10-db
+    container_name: project-2-db
     environment:
-      - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_MULTIPLE_DATABASES="${POSTGRES_ORDERS_DB},${POSTGRES_ORDERS_USER}:${POSTGRES_MERCHANTS_DB},${POSTGRES_MERCHANTS_USER}:${POSTGRES_BUYERS_DB},${POSTGRES_BUYERS_USER}:${POSTGRES_INVENTORY_DB},${POSTGRES_INVENTORY_USER}:${POSTGRES_PAYMENTS_DB},${POSTGRES_PAYMENTS_USER}"
 
     ports:
       - "5432:5432"
@@ -103,6 +221,7 @@ services:
 
     volumes:
       - project-2_postgres_data:/var/lib/postgresql
+      - ./infra/db/init:/docker-entrypoint-initdb.d
 
     restart: unless-stopped
 

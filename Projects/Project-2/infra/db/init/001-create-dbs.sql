@@ -1,6 +1,0 @@
--- Databases
-CREATE DATABASE orders;
-CREATE DATABASE merchants;
-CREATE DATABASE buyers;
-CREATE DATABASE inventory;
-CREATE DATABASE payments;
