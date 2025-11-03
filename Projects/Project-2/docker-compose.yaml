@@ -1,0 +1,103 @@
+version: '3.8'
+
+services:
+  order-service:
+    build: 
+      context: ./OrderService
+      dockerfile: Dockerfile
+    
+    container_name: order-service
+
+  merchant-service:
+    build:
+      context: ./MerchantService
+      dockerfile: Dockerfile
+      
+    container_name: merchant-service
+
+  buyer-service:
+    build:
+      context: ./BuyerService
+      dockerfile: Dockerfile
+      
+    container_name: buyer-service
+
+  inventory-service:
+    build:
+      context: ./InventoryService
+      dockerfile: Dockerfile
+      
+    container_name: inventory-service
+
+  payment-service:
+    build:
+      context: ./PaymentService
+      dockerfile: Dockerfile
+      
+    container_name: payment-service
+
+  email-service:
+    build:
+      context: ./EmailService
+      dockerfile: Dockerfile
+      
+    container_name: email-service
+
+  api-gateway:
+    build:
+      context: ./ApiGateway
+      dockerfile: Dockerfile
+      
+    container_name: api-gateway
+
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=$(RABBITMQ_DEFAULT_USER)
+      - RABBITMQ_DEFAULT_PASS=$(RABBITMQ_DEFAULT_PASS)
+
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:latest
+    container_name: lab10-db
+    environment:
+      - POSTGRES_DB=$(POSTGRES_DB)
+      - POSTGRES_USER=$(POSTGRES_USER)
+      - POSTGRES_PASSWORD=$(POSTGRES_PASSWORD)
+
+    ports:
+      - "5434:5432"
+
+    healthcheck:
+      test: ["CMD", "pg_isready -U myuser -d mydb"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+    volumes:
+      - project-2_postgres_data:/var/lib/postgresql
+
+    restart: unless-stopped
+
+volumes:
+  project-2_postgres_data:
+
+networks:
+  default:
+    driver: bridge
+    name: project-2-network
