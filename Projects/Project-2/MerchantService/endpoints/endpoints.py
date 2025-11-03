@@ -18,6 +18,14 @@ async def get_merchant(
     )
 ):
     merchant = merchant_repository.get_merchant(id=id)
+
+    if not merchant:
+        resp = Response(
+            content="Merchant not found",
+            status_code=404
+        )
+        return resp
+        
     return merchant
 
 
