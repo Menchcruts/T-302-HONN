@@ -33,7 +33,6 @@ def callback(ch, method, properties, body: bytes):
         _process(body)
         ch.basic_ack(delivery_tag=method.delivery_tag)
     except Exception as exc:
-        # NACK and requeue=false to avoid poison-loop; optionally DLX here
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
 
 def start_consumer():
@@ -42,21 +41,16 @@ def start_consumer():
     connection = pika.BlockingConnection(params)
     ch = connection.channel()
 
-    # 1) Make sure the inbound exchange exists
     ch.exchange_declare(exchange=settings.ORDERS_EXCHANGE, exchange_type="topic", durable=True)
 
-    # 2) Declare a durable queue that all PaymentService replicas share
-    #    (so they "take turns" within PaymentService)
     ch.queue_declare(queue=settings.PAYMENT_QUEUE, durable=True)
 
-    # 3) Bind that queue to the exchange with the routing key you care about
     ch.queue_bind(
         exchange=settings.ORDERS_EXCHANGE,
         queue=settings.PAYMENT_QUEUE,
         routing_key=settings.ORDER_CREATED_ROUTING_KEY,
     )
 
-    # (Nice to have) fair dispatch
     ch.basic_qos(prefetch_count=1)
 
     ch.basic_consume(queue=settings.PAYMENT_QUEUE, on_message_callback=callback)
