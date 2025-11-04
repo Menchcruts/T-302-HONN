@@ -55,6 +55,7 @@ class OrderService:
         order_event_payload = {
             "order_id": created_order_id,
             "product_name": product.product_name,
+            "product_id": order.product_id,
             "total_price": total_price,
             "buyer_name": buyer.name,
             "buyer_email": buyer.email,
