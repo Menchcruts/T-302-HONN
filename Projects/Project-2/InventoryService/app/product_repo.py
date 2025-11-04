@@ -71,6 +71,24 @@ class ProductRepository:
         """
         self.cur.execute(update_query)
         self.conn.commit()
+
+    def unreserve_product(self, id: int) -> None:
+        update_query = f"""
+        UPDATE {self.table_name}
+        SET reserved = reserved - 1
+        WHERE id = {id}
+        """
+        self.cur.execute(update_query)
+        self.conn.commit()
+
+    def lower_quantity(self, id: int) -> None:
+        update_query = f"""
+        UPDATE {self.table_name}
+        SET quantity = quantity - 1
+        WHERE id = {id}
+        """
+        self.cur.execute(update_query)
+        self.conn.commit()
     
     def __del__(self) -> None:
         print("Closing connection")
