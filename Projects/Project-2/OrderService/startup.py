@@ -1,8 +1,8 @@
 import uvicorn
-from container import Container
 from fastapi import FastAPI
 
-import endpoints
+from app.container import Container
+from app import endpoints
 
 
 def create_app() -> FastAPI:

@@ -4,7 +4,7 @@ from typing import Optional
 import httpx
 from dataclasses import asdict
 
-from errors import (
+from .errors import (
     BuyerNotFoundError,
     DiscountNotAllowedError,
     ExternalServiceCommunicationError,
@@ -13,13 +13,13 @@ from errors import (
     ProductMerchantMismatch,
     ProductOutOfStock
 )
-from responseDtos.buyer_response_dto import BuyerResponseDTO
-from responseDtos.merchant_response_dto import MerchantResponseDTO
-from responseDtos.product_response_dto import ProductResponseDTO
-from order_inputmodel import OrderInputModel
-from order_repository import OrderRepository
-from order_dto import OrderDTO
-from order_event_publisher import OrderEventPublisher
+from .responseDtos.buyer_response_dto import BuyerResponseDTO
+from .responseDtos.merchant_response_dto import MerchantResponseDTO
+from .responseDtos.product_response_dto import ProductResponseDTO
+from .order_inputmodel import OrderInputModel
+from .order_repository import OrderRepository
+from .order_dto import OrderDTO
+from .order_event_publisher import OrderEventPublisher
 
 
 class OrderService:

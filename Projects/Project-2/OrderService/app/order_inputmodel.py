@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from creditcard_inputmodel import CreditCardInputModel
+from .creditcard_inputmodel import CreditCardInputModel
 
 @dataclass
 class OrderInputModel:
