@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     # Inbound (from OrderService)
     ORDERS_EXCHANGE: str = os.getenv("ORDER_EVENTS_EXCHANGE", "orders.event")
     ORDER_CREATED_ROUTING_KEY: str = os.getenv("ORDER_CREATED_ROUTING_KEY", "order.created")
-    PAYMENT_QUEUE: str = os.getenv("PAYMENT_QUEUE", "orders.order-created.payment")
+    PAYMENT_QUEUE: str = os.getenv("PAYMENT_QUEUE", "orders.order.created.payment")
     
     # Outbound (to others)
     PAYMENTS_EXCHANGE: str = os.getenv("PAYMENTS_EXCHANGE", "payments.events")

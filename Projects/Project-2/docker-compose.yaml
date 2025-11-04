@@ -1,4 +1,4 @@
-version: '3.8'
+# version: '3.8'
 
 services:
   order-service:
@@ -196,12 +196,12 @@ services:
       
     container_name: email-service
 
-  api-gateway:
-    build:
-      context: ./ApiGateway
-      dockerfile: Dockerfile
+  # api-gateway:
+  #   build:
+  #     context: ./ApiGateway
+  #     dockerfile: Dockerfile
       
-    container_name: api-gateway
+  #   container_name: api-gateway
 
 
   rabbitmq:
