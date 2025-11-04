@@ -15,6 +15,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
     environment:
       - POSTGRES_DB=${POSTGRES_ORDERS_DB}
@@ -27,6 +29,11 @@ services:
       - MERCHANT_SERVICE_BASE_URL=${MERCHANT_SERVICE_BASE_URL}
       - BUYER_SERVICE_BASE_URL=${BUYER_SERVICE_BASE_URL}
       - INVENTORY_SERVICE_BASE_URL=${INVENTORY_SERVICE_BASE_URL}
+
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - ORDER_EVENTS_EXCHANGE=orders.events
+      - ORDER_CREATED_ROUTING_KEY=order.created
 
     ports:
       - "${ORDERS_PORT}:${ORDERS_PORT}"
