@@ -8,6 +8,7 @@ from app.config import settings
 def _process(body: bytes):
     data = json.loads(body)
     order_id = data["order_id"]
+    product_id = data["product_id"]
     card = data["credit_card"]
     valid = (
         luhn_check(card["card_number"])
@@ -24,7 +25,7 @@ def _process(body: bytes):
     finally:
         db.close()
 
-    publish_payment_event(order_id, result)
+    publish_payment_event(order_id, product_id, result, data)
 
 def callback(ch, method, properties, body: bytes):
     print("Consumed event")
