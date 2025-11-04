@@ -104,7 +104,7 @@ class EmailEventConsumer:
         ]
 
         for recipient in recipients:
-            html_content = self._build_payment_email_html(recipient.get("name"), message)
+            html_content = self._build_payment_email_html(message)
             self._send_email(recipient.get("email"), subject, html_content)
 
         channel.basic_ack(delivery_tag=method.delivery_tag)
