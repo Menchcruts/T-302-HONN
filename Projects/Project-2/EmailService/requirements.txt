@@ -1,0 +1,4 @@
+fastapi>=0.111.0
+uvicorn==0.15.0
+dependency-injector==4.48.2
+sendgrid==6.11.0
