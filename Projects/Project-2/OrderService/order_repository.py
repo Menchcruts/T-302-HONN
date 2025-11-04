@@ -4,7 +4,7 @@ import psycopg2
 import psycopg2.extras
 
 from order_inputmodel import OrderInputModel
-from order_dto import OrderDTO
+from order_entity import OrderEntity
 
 
 class OrderRepository:
@@ -90,7 +90,7 @@ class OrderRepository:
         return order_id
 
 
-    def get_order(self, id: int) -> OrderDTO:
+    def get_order(self, id: int) -> OrderEntity:
         select_query = f"""
         SELECT o.product_id, o.merchant_id, o.buyer_id, 
                cc.card_number, o.discount
@@ -103,5 +103,5 @@ class OrderRepository:
         if not result:
             return None
         order_data = dict(result)
-        result = OrderDTO(**order_data)
+        result = OrderEntity(**order_data)
         return result

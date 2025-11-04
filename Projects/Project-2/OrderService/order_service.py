@@ -8,7 +8,8 @@ from errors import (
     DiscountNotAllowedError,
     ExternalServiceCommunicationError,
     MerchantNotFoundError,
-    ProductNotFoundError
+    ProductNotFoundError,
+    ProductMerchantMismatch
 )
 from responseDtos.merchant_response_dto import MerchantResponseDTO
 from responseDtos.product_response_dto import ProductResponseDTO
@@ -33,18 +34,29 @@ class OrderService:
     async def create_order(self, order: OrderInputModel) -> int:
         merchant = await self._ensure_merchant_exists_and_fetch(order.merchantId)
         self._validate_discount(discount=order.discount, merchant=merchant)
+        product = self._ensure_product_exists_and_fetch(order.productId)
+
         await self._ensure_buyer_exists(order.buyerId)
         created_order_id = self._order_repository.save_order(order)
         return created_order_id
     
     def get_order(self, order_id: int) -> Optional[OrderDTO]:
         order_data = self._order_repository.get_order(order_id)
-        product = get_product_data
-        order_data.totalPrice = product.price * order_data.discount
         if not order_data:
             return None
 
-        return order_data
+        product = self._ensure_product_exists_and_fetch(order_data.product_id)
+        totalPrice = product.price * order_data.discount
+
+        order = OrderDTO(
+            productId=order_data.productId,
+            merchantId=order_data.merchantId,
+            buyerId=order_data.buyerId,
+            cardNumber=order_data.cardNumber,
+            totalPrice=totalPrice
+        )
+
+        return order
 
     async def _ensure_merchant_exists_and_fetch(self, merchant_id: int) -> MerchantResponseDTO:
         url = f"{self._merchant_service_base_url}/merchants/{merchant_id}"
@@ -99,6 +111,14 @@ class OrderService:
         if has_discount and not allows_discount:
             raise DiscountNotAllowedError()
         
+    def _product_belongs_to_merchant(
+        self,  
+        product: ProductResponseDTO,
+        merchant: MerchantResponseDTO
+    ) -> bool:
+        if product.merchantId != merchant.id: 
+            raise ProductMerchantMismatch()
+
         
     async def _ensure_buyer_exists(self, buyer_id: int) -> None:
         url = f"{self._buyer_service_base_url}/buyers/{buyer_id}"

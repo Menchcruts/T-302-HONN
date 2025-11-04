@@ -23,3 +23,6 @@ class DiscountNotAllowedError(OrderServiceError):
 
 class ExternalServiceCommunicationError(OrderServiceError):
     default_message = "Failed to communicate with service"
+
+class ProductMerchantMismatch(OrderServiceError):
+    default_message = "Product does not belong to the specified merchant"
