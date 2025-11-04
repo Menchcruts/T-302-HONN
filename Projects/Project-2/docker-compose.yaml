@@ -10,6 +10,7 @@ services:
 
     profiles:
       - orders
+      - core
 
     depends_on:
       postgres:
@@ -23,15 +24,19 @@ services:
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT}
 
+      - MERCHANT_SERVICE_BASE_URL=${MERCHANT_SERVICE_BASE_URL}
+      - BUYER_SERVICE_BASE_URL=${BUYER_SERVICE_BASE_URL}
+      - INVENTORY_SERVICE_BASE_URL=${INVENTORY_SERVICE_BASE_URL}
+
     ports:
-      - "${ORDERS_PORT}:8000"
+      - "${ORDERS_PORT}:${ORDERS_PORT}"
 
     restart: "unless-stopped"
     command: [
       "python", "-m", "uvicorn",
       "startup:app",
       "--host", "0.0.0.0",
-      "--port", "8000"
+      "--port", "${ORDERS_PORT}"
     ]
 
   merchant-service:
@@ -43,6 +48,7 @@ services:
 
     profiles:
       - merchant
+      - core
 
     depends_on:
       postgres:
@@ -57,14 +63,14 @@ services:
       - POSTGRES_PORT=${POSTGRES_PORT}
 
     ports:
-      - "${MERCHANTS_PORT}:8001"
+      - "${MERCHANTS_PORT}:${MERCHANTS_PORT}"
 
     restart: "unless-stopped"
     command: [
       "python", "-m", "uvicorn",
       "startup:app",
       "--host", "0.0.0.0",
-      "--port", "8001"
+      "--port", "${MERCHANTS_PORT}"
     ]
 
   buyer-service:
@@ -76,6 +82,7 @@ services:
 
     profiles:
       - buyer
+      - core
 
     depends_on:
       postgres:
@@ -90,14 +97,14 @@ services:
       - POSTGRES_PORT=${POSTGRES_PORT}
 
     ports:
-      - "${BUYERS_PORT}:8002"
+      - "${BUYERS_PORT}:${BUYERS_PORT}"
 
     restart: "unless-stopped"
     command: [
       "python", "-m", "uvicorn",
       "startup:app",
       "--host", "0.0.0.0",
-      "--port", "8002"
+      "--port", "${BUYERS_PORT}"
     ]
 
   inventory-service:
@@ -109,6 +116,7 @@ services:
 
     profiles:
       - inventory
+      - core
 
     depends_on:
       postgres:
@@ -123,14 +131,14 @@ services:
       - POSTGRES_PORT=${POSTGRES_PORT}
 
     ports:
-      - "${INVENTORY_PORT}:8000"
+      - "${INVENTORY_PORT}:${INVENTORY_PORT}"
 
     restart: "unless-stopped"
     command: [
       "python", "-m", "uvicorn",
       "startup:app",
       "--host", "0.0.0.0",
-      "--port", "8000"
+      "--port", "${INVENTORY_PORT}"
     ]
 
   payment-service:
