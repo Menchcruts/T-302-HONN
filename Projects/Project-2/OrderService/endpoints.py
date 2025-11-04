@@ -3,10 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from container import Container
 from errors import (
-    BuyerNotFoundError,
-    DiscountNotAllowedError,
     ExternalServiceCommunicationError,
-    MerchantNotFoundError,
     OrderServiceError
 )
 from order_inputmodel import OrderInputModel
@@ -36,3 +33,22 @@ async def create_order(
         headers={"Location": f"/orders/{order_id}"},
         media_type="text/plain",
     )
+
+@router.get("/orders/{id}", status_code=200)
+@inject
+async def get_merchant(
+    id: int,
+    order_service: OrderService = Depends(
+        Provide[Container.order_service_provider]
+    )
+):
+    order = order_service.get_merchant(id=id)
+
+    if not order:
+        resp = Response(
+            content="order not found",
+            status_code=404
+        )
+        return resp
+    return order
+
