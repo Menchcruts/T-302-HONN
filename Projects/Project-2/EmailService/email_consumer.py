@@ -15,8 +15,8 @@ class EmailEventConsumer:
 
         self._exchange = os.getenv("ORDER_EVENTS_EXCHANGE")
         self._queue = os.getenv("EMAIL_EVENTS_QUEUE")
-        self._routing_key = os.getenv("ORDER_CREATED_ROUTING_KEY", "order.created")
-        self._from_email = os.getenv("EMAIL_FROM_ADDRESS", "no-reply@example.com")
+        self._routing_key = os.getenv("ORDER_CREATED_ROUTING_KEY")
+        self._from_email = os.getenv("SENDGRID_SENDER_EMAIL")
         api_key = os.getenv("SENDGRID_API_KEY")
         if not api_key:
             raise RuntimeError("SENDGRID_API_KEY env variable is required for the email service.")
@@ -35,7 +35,7 @@ class EmailEventConsumer:
 
     def _handle_message(self, channel, method, properties, body) -> None:
         payload = json.loads(body.decode())
-        print(f"Received order event payload:\n{json.dumps(payload, indent=2)}")
+        print("Listening for order.created events...")
 
         recipients = [
             {"name": payload.get("buyer_name"), "email": payload.get("buyer_email")},
@@ -53,6 +53,8 @@ class EmailEventConsumer:
                 html_content=self._build_email_html(payload, recipient.get("name")),
             )
             self._sendgrid.send(message)
+        
+        print(f"Emails sent successfully to buyer {recipients[0]['email']} and merchant {recipients[1]['email']}.")
 
         channel.basic_ack(delivery_tag=method.delivery_tag)
 
