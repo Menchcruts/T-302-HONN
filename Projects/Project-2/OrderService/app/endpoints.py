@@ -1,13 +1,13 @@
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 
-from container import Container
-from errors import (
+from .container import Container
+from .errors import (
     ExternalServiceCommunicationError,
     OrderServiceError
 )
-from order_inputmodel import OrderInputModel
-from order_service import OrderService
+from .order_inputmodel import OrderInputModel
+from .order_service import OrderService
 
 router = APIRouter()
 
@@ -51,4 +51,3 @@ async def get_order(
         )
         return resp
     return order
-

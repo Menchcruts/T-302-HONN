@@ -3,8 +3,8 @@ import os
 import psycopg2
 import psycopg2.extras
 
-from order_inputmodel import OrderInputModel
-from order_entity import OrderEntity
+from .order_inputmodel import OrderInputModel
+from .order_entity import OrderEntity
 
 
 class OrderRepository:

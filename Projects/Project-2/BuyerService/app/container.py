@@ -1,6 +1,6 @@
 from dependency_injector import containers, providers
 
-from buyer_repository import BuyerRepository
+from .buyer_repository import BuyerRepository
 
 
 class Container(containers.DeclarativeContainer):

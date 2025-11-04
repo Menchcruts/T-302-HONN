@@ -198,7 +198,7 @@ services:
 
 
     restart: "unless-stopped"
-    command: ["python", "email_consumer.py"]
+    # command: ["python", "startup.py"]
 
   # api-gateway:
   #   build:

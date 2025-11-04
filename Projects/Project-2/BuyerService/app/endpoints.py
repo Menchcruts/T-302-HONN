@@ -1,12 +1,9 @@
-import json
-from dataclasses import asdict
-
-from container import Container
+from .container import Container
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, Response
-from buyer_repository import BuyerRepository
-from buyer_inputmodel import BuyerInputModel
-from buyer_dto import BuyerDTO
+from .buyer_repository import BuyerRepository
+from .buyer_inputmodel import BuyerInputModel
+from .buyer_dto import BuyerDTO
 
 router = APIRouter()
 

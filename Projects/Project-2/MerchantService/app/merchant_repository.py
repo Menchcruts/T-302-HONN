@@ -3,9 +3,9 @@ import os
 import psycopg2
 import psycopg2.extras
 
-from buyer_dto import BuyerDTO
+from .merchant_dto import MerchantDto
 
-class BuyerRepository:
+class MerchantRepository:
     def __init__(self):
 
         DB_NAME = os.getenv("POSTGRES_DB")
@@ -25,7 +25,7 @@ class BuyerRepository:
         self.cur = self.conn.cursor()
         self.dict_cur = self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-        self.table_name = "buyers"
+        self.table_name = "merchants"
 
         create_table_query = f"""
         CREATE TABLE IF NOT EXISTS {self.table_name} (
@@ -33,28 +33,29 @@ class BuyerRepository:
             name VARCHAR NOT NULL,
             ssn VARCHAR NOT NULL,
             email VARCHAR NOT NULL,
-            phone_number VARCHAR NOT NULL
+            phone_number VARCHAR NOT NULL,
+            allows_discount BOOLEAN NOT NULL
         )
         """
         self.cur.execute(create_table_query)
         self.conn.commit()
 
-    def save_buyer(self, buyer) -> int:
+    def save_merchant(self, merchant) -> int:
         insert_query = f"""
         INSERT INTO {self.table_name} 
-        (name, ssn, email, phone_number) 
-        VALUES (%s, %s, %s, %s) 
+        (name, ssn, email, phone_number, allows_discount) 
+        VALUES (%s, %s, %s, %s, %s) 
         RETURNING id
         """
         self.cur.execute(
             insert_query,
-            (buyer.name, buyer.ssn, buyer.email, buyer.phone_number)
+            (merchant.name, merchant.ssn, merchant.email, merchant.phone_number, merchant.allows_discount)
         )
         _id = self.cur.fetchone()
         self.conn.commit()
         return _id[0]
 
-    def get_buyer(self, id: int):
+    def get_merchant(self, id: int):
         select_query = f"""
         SELECT *
         FROM {self.table_name} 
@@ -64,7 +65,7 @@ class BuyerRepository:
         result = self.dict_cur.fetchone()
         if not result:
             return None
-        buyer_data = dict(result)
-        buyer_data.pop("id", None)
-        result = BuyerDTO(**buyer_data)
+        merchant_data = dict(result)
+        merchant_data.pop("id", None)
+        result = MerchantDto(**merchant_data)
         return result

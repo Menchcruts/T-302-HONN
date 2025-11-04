@@ -1,9 +1,9 @@
-from container import Container
+from .container import Container
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, Response
-from merchant_repository import MerchantRepository
-from merchant_inputmodel import MerchantInputModel
-from merchant_dto import MerchantDto
+from .merchant_repository import MerchantRepository
+from .merchant_inputmodel import MerchantInputModel
+from .merchant_dto import MerchantDto
 
 router = APIRouter()
 
