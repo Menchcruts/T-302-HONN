@@ -26,8 +26,9 @@ def _process(body: bytes):
 
     publish_payment_event(order_id, result)
 
-def callback(ch, method, properties, body):
+def callback(ch, method, properties, body: bytes):
     print("Consumed event")
+    print(body.decode())
     try:
         _process(body)
         ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -36,6 +37,7 @@ def callback(ch, method, properties, body):
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
 
 def start_consumer():
+    print("Starting consumer...")
     params = pika.URLParameters(settings.RABBITMQ_URL)
     connection = pika.BlockingConnection(params)
     ch = connection.channel()
@@ -58,5 +60,5 @@ def start_consumer():
     ch.basic_qos(prefetch_count=1)
 
     ch.basic_consume(queue=settings.PAYMENT_QUEUE, on_message_callback=callback)
-    print("PaymentService waiting for order.created events via exchange...")
+    print(f"PaymentService waiting for {settings.ORDERS_EXCHANGE} events via exchange...")
     ch.start_consuming()
