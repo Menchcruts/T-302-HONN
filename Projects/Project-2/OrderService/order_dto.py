@@ -2,9 +2,9 @@ from dataclasses import dataclass
 
 @dataclass
 class OrderDTO:
-    productId: int
-    merchantId: int
-    buyerId: int
-    cardNumber: str
-    totalPrice: float
+    product_id: int
+    merchant_id: int
+    buyer_id: int
+    card_number: str
+    total_price: float
 

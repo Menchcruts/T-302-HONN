@@ -26,3 +26,6 @@ class ExternalServiceCommunicationError(OrderServiceError):
 
 class ProductMerchantMismatch(OrderServiceError):
     default_message = "Product does not belong to the specified merchant"
+
+class ProductOutOfStock(OrderServiceError):
+    default_message = "Product out of stock"

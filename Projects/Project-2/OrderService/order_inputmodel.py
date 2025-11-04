@@ -5,8 +5,8 @@ from creditcard_inputmodel import CreditCardInputModel
 
 @dataclass
 class OrderInputModel:
-    productId: int
-    merchantId: int
-    buyerId: int
-    creditCard: CreditCardInputModel
+    product_id: int
+    merchant_id: int
+    buyer_id: int
+    credit_card: CreditCardInputModel
     discount: Optional[float] = None

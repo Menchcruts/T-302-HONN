@@ -36,13 +36,13 @@ async def create_order(
 
 @router.get("/orders/{id}", status_code=200)
 @inject
-async def get_merchant(
+async def get_order(
     id: int,
     order_service: OrderService = Depends(
         Provide[Container.order_service_provider]
     )
 ):
-    order = order_service.get_merchant(id=id)
+    order = await order_service.get_order(order_id=id)
 
     if not order:
         resp = Response(

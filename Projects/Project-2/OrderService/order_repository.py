@@ -64,10 +64,10 @@ class OrderRepository:
         VALUES (%s, %s, %s, %s) RETURNING id
         """
         self.cur.execute(credit_card_insert, (
-            order.creditCard.cardNumber,
-            order.creditCard.expirationMonth,
-            order.creditCard.expirationYear,
-            order.creditCard.cvc
+            order.credit_card.card_number,
+            order.credit_card.expiration_month,
+            order.credit_card.expiration_year,
+            order.credit_card.cvc
         ))
         credit_card_id = self.cur.fetchone()[0]
 
@@ -79,9 +79,9 @@ class OrderRepository:
         discount = order.discount if order.discount is not None else 0.0
 
         self.cur.execute(order_insert, (
-            order.productId,
-            order.merchantId,
-            order.buyerId,
+            order.product_id,
+            order.merchant_id,
+            order.buyer_id,
             credit_card_id,
             discount
         ))
@@ -99,7 +99,7 @@ class OrderRepository:
         WHERE o.id = %s
         """
         self.dict_cur.execute(select_query, (id,))
-        result = self.cur.fetchone()
+        result = self.dict_cur.fetchone()
         if not result:
             return None
         order_data = dict(result)

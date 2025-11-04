@@ -2,8 +2,8 @@ from dataclasses import dataclass
 
 @dataclass
 class CreditCardInputModel:
-    cardNumber: str
-    expirationMonth: int
-    expirationYear: int
+    card_number: str
+    expiration_month: int
+    expiration_year: int
     cvc: int
     

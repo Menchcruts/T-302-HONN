@@ -9,7 +9,8 @@ from errors import (
     ExternalServiceCommunicationError,
     MerchantNotFoundError,
     ProductNotFoundError,
-    ProductMerchantMismatch
+    ProductMerchantMismatch,
+    ProductOutOfStock
 )
 from responseDtos.merchant_response_dto import MerchantResponseDTO
 from responseDtos.product_response_dto import ProductResponseDTO
@@ -32,28 +33,33 @@ class OrderService:
         self._request_timeout_seconds = request_timeout_seconds
 
     async def create_order(self, order: OrderInputModel) -> int:
-        merchant = await self._ensure_merchant_exists_and_fetch(order.merchantId)
+        merchant = await self._ensure_merchant_exists_and_fetch(order.merchant_id)
         self._validate_discount(discount=order.discount, merchant=merchant)
-        product = self._ensure_product_exists_and_fetch(order.productId)
+        product = await self._ensure_product_exists_and_fetch(order.product_id)
 
-        await self._ensure_buyer_exists(order.buyerId)
+        self._ensure_product_belongs_to_merchant(product, order.merchant_id)
+
+        await self._ensure_buyer_exists(order.buyer_id)
         created_order_id = self._order_repository.save_order(order)
+
+        await self._reserve_product(order.product_id)
+
         return created_order_id
     
-    def get_order(self, order_id: int) -> Optional[OrderDTO]:
+    async def get_order(self, order_id: int) -> Optional[OrderDTO]:
         order_data = self._order_repository.get_order(order_id)
         if not order_data:
             return None
 
-        product = self._ensure_product_exists_and_fetch(order_data.product_id)
-        totalPrice = product.price * order_data.discount
+        product = await self._ensure_product_exists_and_fetch(order_data.product_id)
+        totalPrice = product.price * (1 - order_data.discount)
 
         order = OrderDTO(
-            productId=order_data.productId,
-            merchantId=order_data.merchantId,
-            buyerId=order_data.buyerId,
-            cardNumber=order_data.cardNumber,
-            totalPrice=totalPrice
+            product_id=order_data.product_id,
+            merchant_id=order_data.merchant_id,
+            buyer_id=order_data.buyer_id,
+            card_number=self._hash_card_number(order_data.card_number),
+            total_price=totalPrice
         )
 
         return order
@@ -97,6 +103,18 @@ class OrderService:
             message = f"Unexpected product payload ({exc})"
             raise ExternalServiceCommunicationError(message)
 
+    async def _reserve_product(self, product_id: int) -> None:
+        url = f"{self._inventory_service_base_url}/products/reserve/{product_id}"
+        response = await self._put(url)
+        if response.status_code == 400:
+            raise ProductOutOfStock()
+        
+
+    def _hash_card_number(self, cc_number: str) -> str:
+        str_len = len(cc_number)
+        stars = str_len - 4
+        return "*"*stars + cc_number[-4:]
+
     def _validate_discount(
         self,
         discount: Optional[float],
@@ -111,13 +129,14 @@ class OrderService:
         if has_discount and not allows_discount:
             raise DiscountNotAllowedError()
         
-    def _product_belongs_to_merchant(
+    def _ensure_product_belongs_to_merchant(
         self,  
         product: ProductResponseDTO,
-        merchant: MerchantResponseDTO
+        merchant_id: int
     ) -> bool:
-        if product.merchantId != merchant.id: 
+        if product.merchant_id != merchant_id: 
             raise ProductMerchantMismatch()
+        return True
 
         
     async def _ensure_buyer_exists(self, buyer_id: int) -> None:
@@ -135,4 +154,9 @@ class OrderService:
     async def _get(self, url: str) -> httpx.Response:
         async with httpx.AsyncClient(timeout=self._request_timeout_seconds) as client:
             response = await client.get(url)
+        return response
+
+    async def _put(self, url: str) -> httpx.Response:
+        async with httpx.AsyncClient(timeout=self._request_timeout_seconds) as client:
+            response = await client.put(url)
         return response
