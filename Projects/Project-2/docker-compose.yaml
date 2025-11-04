@@ -130,6 +130,11 @@ services:
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT}
 
+      - RABBITMQ_PASS=${RABBITMQ_DEFAULT_PASS}
+      - RABBITMQ_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+
     ports:
       - "${INVENTORY_PORT}:${INVENTORY_PORT}"
 
@@ -146,7 +151,7 @@ services:
       context: ./PaymentService
       dockerfile: Dockerfile
       
-    container_name: payment-service
+    # container_name: payment-service
 
     profiles:
       - payment
@@ -154,24 +159,27 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
     environment:
-      - POSTGRES_DB=${POSTGRES_PAYMENTS_DB}
-      - POSTGRES_USER=${POSTGRES_PAYMENTS_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PAYMENTS_PASS}
+      - DATABASE_URL=${POSTGRES_PAYMENTS_URL}
+      - RABBITMQ_URL=${RABBITMQ_URL}
 
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
+      - ORDERS_EXCHANGE=${ORDER_EVENTS_EXCHANGE}
+      - ORDER_CREATED_KEY=${ORDER_CREATED_ROUTING_KEY}
 
-    ports:
-      - "${PAYMENTS_PORT}:8000"
+      - PAYMENTS_EXCHANGE=${PAYMENTS_EVENTS_EXCHANGE}
+      - PAYMENT_QUEUE=${PAYMENT_EVENTS_QUEUE}
+      - PAYMENT_SUCCESS_KEY=${PAYMENT_SUCCESS_KEY}
+      - PAYMENT_FAILURE_KEY=${PAYMENT_FAILURE_KEY}
+
+    # ports:
+    #   - "${PAYMENTS_PORT}:8000"
 
     restart: "unless-stopped"
     command: [
-      "python", "-m", "uvicorn",
-      "startup:app",
-      "--host", "0.0.0.0",
-      "--port", "8000"
+      "python", "-m", "startup"
     ]
 
   email-service:
