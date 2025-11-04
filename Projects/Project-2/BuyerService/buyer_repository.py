@@ -1,7 +1,9 @@
 import os
 
 import psycopg2
+import psycopg2.extras
 
+from buyer_dto import BuyerDTO
 
 class BuyerRepository:
     def __init__(self):
@@ -21,6 +23,7 @@ class BuyerRepository:
         )
 
         self.cur = self.conn.cursor()
+        self.dict_cur = self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         self.table_name = "buyers"
 
@@ -45,7 +48,7 @@ class BuyerRepository:
         """
         self.cur.execute(
             insert_query,
-            (buyer.name, buyer.ssn, buyer.email, buyer.phoneNumber)
+            (buyer.name, buyer.ssn, buyer.email, buyer.phone_number)
         )
         _id = self.cur.fetchone()
         self.conn.commit()
@@ -53,10 +56,15 @@ class BuyerRepository:
 
     def get_buyer(self, id: int):
         select_query = f"""
-        SELECT name, ssn, email, phone_number
+        SELECT *
         FROM {self.table_name} 
         WHERE id = %s
         """
-        self.cur.execute(select_query, (id,))
-        result = self.cur.fetchone()
+        self.dict_cur.execute(select_query, (id,))
+        result = self.dict_cur.fetchone()
+        if not result:
+            return None
+        buyer_data = dict(result)
+        buyer_data.pop("id", None)
+        result = BuyerDTO(**buyer_data)
         return result

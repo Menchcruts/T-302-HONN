@@ -1,4 +1,5 @@
 import json
+from dataclasses import asdict
 
 from container import Container
 from dependency_injector.wiring import Provide, inject
@@ -27,14 +28,7 @@ async def get_buyer(
         )
         return resp
     
-    buyer_dto = BuyerDTO(
-        name=buyer[0],
-        ssn=buyer[1],
-        email=buyer[2],
-        phoneNumber=buyer[3]
-    )
-
-    return buyer_dto
+    return buyer
 
 
 @router.post("/buyers", status_code=201)

@@ -6,4 +6,4 @@ class BuyerInputModel:
     name: str
     ssn: str
     email: str
-    phoneNumber: str
+    phone_number: str

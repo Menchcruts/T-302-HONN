@@ -1,7 +1,10 @@
 import os
+
 import psycopg2
-from models.input.order import Order
-from models.dtos.order import Order as OrderDTO
+import psycopg2.extras
+
+from order_inputmodel import OrderInputModel
+from order_dto import OrderDTO
 
 
 class OrderRepository:
@@ -22,7 +25,8 @@ class OrderRepository:
         )
 
         self.cur = self.conn.cursor()
-
+        self.dict_cur = self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
         self.orders_table = "orders"
         self.credit_cards_table = "credit_cards"
 
@@ -53,7 +57,7 @@ class OrderRepository:
         self.conn.commit()
 
 
-    def save_order(self, order: Order) -> int:
+    def save_order(self, order: OrderInputModel) -> int:
         credit_card_insert = f"""
         INSERT INTO {self.credit_cards_table} 
         (card_number, expiration_month, expiration_year, cvc) 
@@ -72,12 +76,14 @@ class OrderRepository:
         (product_id, merchant_id, buyer_id, credit_card_id, discount) 
         VALUES (%s, %s, %s, %s, %s) RETURNING id
         """
+        discount = order.discount if order.discount is not None else 0.0
+
         self.cur.execute(order_insert, (
             order.productId,
             order.merchantId,
             order.buyerId,
             credit_card_id,
-            order.discount
+            discount
         ))
         order_id = self.cur.fetchone()[0]
         self.conn.commit()
@@ -92,17 +98,10 @@ class OrderRepository:
         JOIN {self.credit_cards_table} cc ON o.credit_card_id = cc.id
         WHERE o.id = %s
         """
-        self.cur.execute(select_query, (id,))
+        self.dict_cur.execute(select_query, (id,))
         result = self.cur.fetchone()
-        
-        if result:
-            product_id, merchant_id, buyer_id, card_number, discount = result
-            total_price = discount  
-            return OrderDTO(
-                productId=product_id,
-                merchantId=merchant_id,
-                buyerId=buyer_id,
-                cardNumber=card_number,
-                totalPrice=total_price
-            )
-        return None
+        if not result:
+            return None
+        order_data = dict(result)
+        result = OrderDTO(**order_data)
+        return result

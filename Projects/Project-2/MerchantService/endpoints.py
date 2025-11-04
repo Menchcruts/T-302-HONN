@@ -24,15 +24,7 @@ async def get_merchant(
             status_code=404
         )
         return resp
-    
-    merchant_dto = MerchantDto(
-        name=merchant[0],
-        ssn=merchant[1],
-        email=merchant[2],
-        phoneNumber=merchant[3],
-        allowsDiscount=merchant[4]
-    )
-    return merchant_dto
+    return merchant
 
 
 @router.post("/merchants", status_code=201)

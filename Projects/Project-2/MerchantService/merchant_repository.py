@@ -1,7 +1,9 @@
 import os
 
 import psycopg2
+import psycopg2.extras
 
+from merchant_dto import MerchantDto
 
 class MerchantRepository:
     def __init__(self):
@@ -21,6 +23,7 @@ class MerchantRepository:
         )
 
         self.cur = self.conn.cursor()
+        self.dict_cur = self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         self.table_name = "merchants"
 
@@ -46,7 +49,7 @@ class MerchantRepository:
         """
         self.cur.execute(
             insert_query,
-            (merchant.name, merchant.ssn, merchant.email, merchant.phoneNumber, merchant.allowsDiscount)
+            (merchant.name, merchant.ssn, merchant.email, merchant.phone_number, merchant.allows_discount)
         )
         _id = self.cur.fetchone()
         self.conn.commit()
@@ -54,10 +57,15 @@ class MerchantRepository:
 
     def get_merchant(self, id: int):
         select_query = f"""
-        SELECT name, ssn, email, phone_number, allows_discount
+        SELECT *
         FROM {self.table_name} 
         WHERE id = %s
         """
-        self.cur.execute(select_query, (id,))
-        result = self.cur.fetchone()
+        self.dict_cur.execute(select_query, (id,))
+        result = self.dict_cur.fetchone()
+        if not result:
+            return None
+        merchant_data = dict(result)
+        merchant_data.pop("id", None)
+        result = MerchantDto(**merchant_data)
         return result

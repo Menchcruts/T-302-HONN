@@ -1,0 +1,1 @@
+# Response DTO package marker.

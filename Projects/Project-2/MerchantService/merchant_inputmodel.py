@@ -6,5 +6,5 @@ class MerchantInputModel:
     name: str
     ssn: str
     email: str
-    phoneNumber: str
-    allowsDiscount: bool
+    phone_number: str
+    allows_discount: bool

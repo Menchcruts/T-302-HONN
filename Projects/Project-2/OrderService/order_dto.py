@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 @dataclass
-class Order:
+class OrderDTO:
     productId: int
     merchantId: int
     buyerId: int
