@@ -43,3 +43,32 @@ async def post_product(
         headers={"Location":f"/products/{created_id}"}
     )
     return resp
+
+
+@router.put("/products/reserve/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@inject
+async def reserve_product(
+    id: int,
+    product_repo: ProductRepository = Depends(Provide[Container.product_repo_provider])
+) -> None:
+    product = product_repo.get_product(id=id)
+    if not product:
+        resp = Response(
+            content="Product not found",
+            status_code=status.HTTP_404_NOT_FOUND
+        )
+        return resp
+    
+    if product.quantity <= product.reserved:
+        resp = Response(
+            content="Product out of stock",
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+        return resp
+
+    product_repo.reserve_product(id)
+
+    resp = Response(
+        status_code=status.HTTP_204_NO_CONTENT
+    )
+    return resp

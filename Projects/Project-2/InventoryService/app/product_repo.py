@@ -56,11 +56,21 @@ class ProductRepository:
     def get_product(self, id: int) -> Product | None:
         select_query = f"SELECT * FROM {self.table_name} WHERE id = {id}"
         self.dict_cur.execute(select_query)
-        result = dict(self.dict_cur.fetchone())
+        result = self.dict_cur.fetchone()
         if result:
+            result = dict(result)
             result.pop("id")
             return Product(**result)
         return None
+    
+    def reserve_product(self, id: int) -> None:
+        update_query = f"""
+        UPDATE {self.table_name}
+        SET reserved = reserved + 1
+        WHERE id = {id}
+        """
+        self.cur.execute(update_query)
+        self.conn.commit()
     
     def __del__(self) -> None:
         print("Closing connection")
