@@ -195,6 +195,27 @@ services:
       dockerfile: Dockerfile
       
     container_name: email-service
+    profiles:
+      - email
+      - core
+
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      
+    env_file:
+      - ./EmailService/.env
+
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - ORDER_EVENTS_EXCHANGE=${ORDER_EVENTS_EXCHANGE}
+      - ORDER_CREATED_ROUTING_KEY=${ORDER_CREATED_ROUTING_KEY}
+      - EMAIL_EVENTS_QUEUE=${EMAIL_EVENTS_QUEUE}
+
+
+    restart: "unless-stopped"
+    command: ["python", "email_consumer.py"]
 
   # api-gateway:
   #   build:

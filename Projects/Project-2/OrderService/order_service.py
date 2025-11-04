@@ -13,7 +13,6 @@ from errors import (
     ProductMerchantMismatch,
     ProductOutOfStock
 )
-from dependency_injector.wiring import Provide, inject
 from responseDtos.buyer_response_dto import BuyerResponseDTO
 from responseDtos.merchant_response_dto import MerchantResponseDTO
 from responseDtos.product_response_dto import ProductResponseDTO
@@ -21,15 +20,14 @@ from order_inputmodel import OrderInputModel
 from order_repository import OrderRepository
 from order_dto import OrderDTO
 from order_event_publisher import OrderEventPublisher
-from container import Container
 
 
 class OrderService:
-    @inject
+
     def __init__(
         self,
-        order_repository: OrderRepository =  Provide[Container.order_repository_provider],
-        order_event_publisher: OrderEventPublisher = Provide[Container.order_event_publisher],
+        order_repository: OrderRepository,
+        order_event_publisher: OrderEventPublisher,
         request_timeout_seconds: float = 5.0,
     ) -> None:
         self._order_repository = order_repository
@@ -56,17 +54,12 @@ class OrderService:
 
         order_event_payload = {
             "order_id": created_order_id,
-            "product_id": order.product_id,
-            "discount": order.discount,
+            "product_name": product.product_name,
             "total_price": total_price,
             "buyer_name": buyer.name,
             "buyer_email": buyer.email,
-            "buyer_phone_number": buyer.phone_number,
-            "buyer_address": buyer.address,
             "merchant_name": merchant.name,
             "merchant_email": merchant.email,
-            "merchant_phone_number": merchant.phone_number,
-            "product_name": product.product_name,
             "credit_card": asdict(order.credit_card)
         }
         self._order_event_publisher.publish(order_event_payload)

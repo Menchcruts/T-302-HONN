@@ -10,10 +10,12 @@ class Container(containers.DeclarativeContainer):
         OrderRepository
     )
 
-    order_service_provider = providers.Singleton(
-        OrderService
-    )
-
     order_event_publisher = providers.Singleton(
         OrderEventPublisher
+    )
+
+    order_service_provider = providers.Singleton(
+        OrderService,
+        order_repository=order_repository_provider,
+        order_event_publisher=order_event_publisher
     )
