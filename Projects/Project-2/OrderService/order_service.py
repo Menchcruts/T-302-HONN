@@ -2,6 +2,7 @@ import os
 from typing import Optional
 
 import httpx
+from dataclasses import asdict
 
 from errors import (
     BuyerNotFoundError,
@@ -12,21 +13,27 @@ from errors import (
     ProductMerchantMismatch,
     ProductOutOfStock
 )
+from dependency_injector.wiring import Provide, inject
+from responseDtos.buyer_response_dto import BuyerResponseDTO
 from responseDtos.merchant_response_dto import MerchantResponseDTO
 from responseDtos.product_response_dto import ProductResponseDTO
 from order_inputmodel import OrderInputModel
 from order_repository import OrderRepository
 from order_dto import OrderDTO
+from order_event_publisher import OrderEventPublisher
+from container import Container
 
 
 class OrderService:
-
+    @inject
     def __init__(
         self,
-        order_repository: OrderRepository,
+        order_repository: OrderRepository =  Provide[Container.order_repository_provider],
+        order_event_publisher: OrderEventPublisher = Provide[Container.order_event_publisher],
         request_timeout_seconds: float = 5.0,
     ) -> None:
         self._order_repository = order_repository
+        self._order_event_publisher = order_event_publisher
         self._merchant_service_base_url = os.getenv("MERCHANT_SERVICE_BASE_URL")
         self._buyer_service_base_url = os.getenv("BUYER_SERVICE_BASE_URL")
         self._inventory_service_base_url = os.getenv("INVENTORY_SERVICE_BASE_URL")
@@ -39,10 +46,30 @@ class OrderService:
 
         self._ensure_product_belongs_to_merchant(product, order.merchant_id)
 
-        await self._ensure_buyer_exists(order.buyer_id)
+        buyer = await self._ensure_buyer_exists_and_fetch(order.buyer_id)
         created_order_id = self._order_repository.save_order(order)
 
         await self._reserve_product(order.product_id)
+
+        discount_value = float(order.discount or 0.0)
+        total_price = product.price * (1 - discount_value)
+
+        order_event_payload = {
+            "order_id": created_order_id,
+            "product_id": order.product_id,
+            "discount": order.discount,
+            "total_price": total_price,
+            "buyer_name": buyer.name,
+            "buyer_email": buyer.email,
+            "buyer_phone_number": buyer.phone_number,
+            "buyer_address": buyer.address,
+            "merchant_name": merchant.name,
+            "merchant_email": merchant.email,
+            "merchant_phone_number": merchant.phone_number,
+            "product_name": product.product_name,
+            "credit_card": asdict(order.credit_card)
+        }
+        self._order_event_publisher.publish(order_event_payload)
 
         return created_order_id
     
@@ -139,7 +166,7 @@ class OrderService:
         return True
 
         
-    async def _ensure_buyer_exists(self, buyer_id: int) -> None:
+    async def _ensure_buyer_exists_and_fetch(self, buyer_id: int) -> BuyerResponseDTO:
         url = f"{self._buyer_service_base_url}/buyers/{buyer_id}"
         response = await self._get(url)
         if response.status_code == 404:
@@ -149,6 +176,13 @@ class OrderService:
             message = (
                 f"Unexpected response ({response.status_code}) "
             )
+            raise ExternalServiceCommunicationError(message)
+
+        buyer_payload = response.json()
+        try:
+            return BuyerResponseDTO(**buyer_payload)
+        except TypeError as exc:
+            message = f"Unexpected buyer payload ({exc})"
             raise ExternalServiceCommunicationError(message)
 
     async def _get(self, url: str) -> httpx.Response:
