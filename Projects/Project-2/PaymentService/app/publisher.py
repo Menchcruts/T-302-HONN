@@ -16,5 +16,5 @@ def publish_payment_event(order_id: int, product_id: int, result: str, data: dic
         body=json.dumps(payload),
         properties=pika.BasicProperties(delivery_mode=2),  # make message persistent
     )
-    print(f"Publishing event: {payload}")
+    print(f"Publishing event: {payload}", flush=True)
     connection.close()

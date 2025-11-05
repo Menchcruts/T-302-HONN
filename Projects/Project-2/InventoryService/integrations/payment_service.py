@@ -35,9 +35,9 @@ class PaymentEventConsumer:
 
 
     def _handle_message(self, channel, method, properties, body: bytes) -> None:
-        print("Consumed event...")
+        print("Consumed event...", flush=True)
         payload: dict = json.loads(body)
-        print(payload)
+        print(payload, flush=True)
 
         product_id = payload.get("product_id")
         result = payload.get("result")
@@ -54,13 +54,13 @@ class PaymentEventConsumer:
         channel.basic_ack(delivery_tag=method.delivery_tag)
 
     def start(self) -> None:
-        print("InventoryService started consuming...")
+        print("InventoryService started consuming...", flush=True)
         self._channel.basic_qos(prefetch_count=1)
         self._channel.basic_consume(queue=self._queue, on_message_callback=self._handle_message)
         self._channel.start_consuming()
 
 def main():
-    print("Consuming thread started...")
+    print("Consuming thread started...", flush=True)
     consumer = PaymentEventConsumer(ProductRepository())
     consumer.start()
 

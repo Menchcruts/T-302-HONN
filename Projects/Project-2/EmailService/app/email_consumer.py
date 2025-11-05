@@ -63,7 +63,7 @@ class EmailEventConsumer:
         self._channel.basic_qos(prefetch_count=1)
         self._channel.basic_consume(queue=self._order_queue, on_message_callback=self._handle_order_created)
         self._channel.basic_consume(queue=self._payments_queue, on_message_callback=self._handle_payment_event)
-        print("EmailEventConsumer listening for order and payment events...")
+        print("EmailEventConsumer listening for order and payment events...", flush=True)
         self._channel.start_consuming()
 
     def _handle_order_created(self, channel, method, properties, body) -> None:
@@ -81,6 +81,7 @@ class EmailEventConsumer:
         channel.basic_ack(delivery_tag=method.delivery_tag)
 
     def _handle_payment_event(self, channel, method, properties, body) -> None:
+        print("+-------------------- testing --------------------+", flush=True)
         payload = json.loads(body.decode())
         order_id = payload.get("order_id")
         routing_key = method.routing_key
@@ -118,7 +119,7 @@ class EmailEventConsumer:
             html_content=html_content,
         )
         self._sendgrid.send(message)
-        print(f"[EmailService] Sent '{subject}' to {to_email}")
+        print(f"[EmailService] Sent '{subject}' to {to_email}", flush=True)
         return True
 
     def _build_order_created_email(self, payload: Dict[str, Any], recipient_name: Optional[str]) -> str:
