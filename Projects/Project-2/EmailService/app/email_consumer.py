@@ -87,7 +87,6 @@ class EmailEventConsumer:
             channel.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
 
     def _handle_payment_event(self, channel, method, properties, body) -> None:
-        print("+-------------------- testing --------------------+", flush=True)
         payload = json.loads(body.decode())
         data = payload["data"]
         order_id = payload.get("order_id")
@@ -130,8 +129,7 @@ class EmailEventConsumer:
                 subject=subject,
                 html_content=html_content,
             )
-            if to_email is None: int("1.1")
-            # response = self._sendgrid.send(message)
+            response = self._sendgrid.send(message)
             print(f"[EmailService] Sent '{subject}' to {to_email}")
             return True
         except Exception as e:

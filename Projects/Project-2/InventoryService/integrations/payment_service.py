@@ -36,9 +36,7 @@ class PaymentEventConsumer:
 
     def _handle_message(self, channel, method, properties, body: bytes) -> None:
         print("Consumed event...", flush=True)
-        print(f"routing key: {method.routing_key}")
         payload: dict = json.loads(body)
-        print(payload, flush=True)
 
         product_id = payload.get("product_id")
         result = payload.get("result")

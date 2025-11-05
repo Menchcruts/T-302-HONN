@@ -29,7 +29,6 @@ def _process(body: bytes):
 
 def callback(ch, method, properties, body: bytes):
     print("Consumed event", flush=True)
-    print(body.decode(), flush=True)
     try:
         _process(body)
         ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -55,5 +54,5 @@ def start_consumer():
     ch.basic_qos(prefetch_count=1)
 
     ch.basic_consume(queue=settings.PAYMENT_QUEUE, on_message_callback=callback)
-    print(f"PaymentService waiting for {settings.ORDERS_EXCHANGE} events via exchange...", flush=True)
+    print(f"PaymentService waiting for {settings.ORDERS_EXCHANGE} events...", flush=True)
     ch.start_consuming()
