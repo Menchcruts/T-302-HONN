@@ -31,8 +31,8 @@ services:
       - ORDER_EVENTS_EXCHANGE=orders.events
       - ORDER_CREATED_ROUTING_KEY=order.created
 
-    ports:
-      - "${ORDERS_PORT}:${ORDERS_PORT}"
+    # ports:
+    #   - "${ORDERS_PORT}:${ORDERS_PORT}"
 
     restart: "unless-stopped"
     command: [
@@ -61,8 +61,8 @@ services:
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT}
 
-    ports:
-      - "${MERCHANTS_PORT}:${MERCHANTS_PORT}"
+    # ports:
+    #   - "${MERCHANTS_PORT}:${MERCHANTS_PORT}"
 
     restart: "unless-stopped"
     command: [
@@ -91,8 +91,8 @@ services:
       - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT}
 
-    ports:
-      - "${BUYERS_PORT}:${BUYERS_PORT}"
+    # ports:
+    #   - "${BUYERS_PORT}:${BUYERS_PORT}"
 
     restart: "unless-stopped"
     command: [
@@ -131,8 +131,8 @@ services:
       - PAYMENTS_SUCCESS_KEY=${PAYMENT_SUCCESS_KEY}
       - PAYMENTS_FAILED_KEY=${PAYMENT_FAILURE_KEY}
 
-    ports:
-      - "${INVENTORY_PORT}:${INVENTORY_PORT}"
+    # ports:
+    #   - "${INVENTORY_PORT}:${INVENTORY_PORT}"
 
     restart: "unless-stopped"
     command: [
@@ -208,12 +208,29 @@ services:
     restart: "unless-stopped"
     # command: ["python", "startup.py"]
 
-  # api-gateway:
-  #   build:
-  #     context: ./ApiGateway
-  #     dockerfile: Dockerfile
+  api-gateway:
+    build:
+      context: ./ApiGateway
+      dockerfile: Dockerfile
       
-  #   container_name: api-gateway
+    container_name: api-gateway
+
+    environment:
+      - ORDER_SERVICE_BASE_URL=${ORDER_SERVICE_BASE_URL}
+      - MERCHANT_SERVICE_BASE_URL=${MERCHANT_SERVICE_BASE_URL}
+      - BUYER_SERVICE_BASE_URL=${BUYER_SERVICE_BASE_URL}
+      - INVENTORY_SERVICE_BASE_URL=${INVENTORY_SERVICE_BASE_URL}
+
+    ports:
+      - "8000:8000"
+
+    restart: "unless-stopped"
+    command: [
+      "python", "-m", "uvicorn",
+      "startup:app",
+      "--host", "0.0.0.0",
+      "--port", "8000"
+    ]
 
 
   rabbitmq:
