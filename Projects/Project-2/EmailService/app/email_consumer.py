@@ -21,6 +21,7 @@ class EmailEventConsumer:
 
         self._payments_exchange = os.getenv("PAYMENTS_EVENTS_EXCHANGE")
         self._payments_queue = os.getenv("PAYMENT_EVENTS_QUEUE")
+        self._payments_queue = "test"
         self._payment_success_routing_key = os.getenv("PAYMENT_SUCCESS_KEY")
         self._payment_failure_routing_key = os.getenv("PAYMENT_FAILURE_KEY")
 
@@ -88,6 +89,7 @@ class EmailEventConsumer:
     def _handle_payment_event(self, channel, method, properties, body) -> None:
         print("+-------------------- testing --------------------+", flush=True)
         payload = json.loads(body.decode())
+        data = payload["data"]
         order_id = payload.get("order_id")
         routing_key = method.routing_key
         is_success = routing_key == self._payment_success_routing_key
@@ -100,12 +102,12 @@ class EmailEventConsumer:
 
         recipients = [
             {
-                "name": payload.get("buyer_name"),
-                "email": payload.get("buyer_email"),
+                "name": data.get("buyer_name"),
+                "email": data.get("buyer_email"),
             },
             {
-                "name": payload.get("merchant_name"),
-                "email": payload.get("merchant_email"),
+                "name": data.get("merchant_name"),
+                "email": data.get("merchant_email"),
             },
         ]
 
@@ -128,7 +130,8 @@ class EmailEventConsumer:
                 subject=subject,
                 html_content=html_content,
             )
-            response = self._sendgrid.send(message)
+            if to_email is None: int("1.1")
+            # response = self._sendgrid.send(message)
             print(f"[EmailService] Sent '{subject}' to {to_email}")
             return True
         except Exception as e:
