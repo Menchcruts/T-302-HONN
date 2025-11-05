@@ -74,11 +74,16 @@ class EmailEventConsumer:
             {"name": payload.get("merchant_name"), "email": payload.get("merchant_email")},
         ]
 
+        success = True
         for recipient in recipients:
             html_content = self._build_order_created_email(payload, recipient.get("name"))
-            self._send_email(recipient.get("email"), subject, html_content)
+            if not self._send_email(recipient.get("email"), subject, html_content):
+                success = False
 
-        channel.basic_ack(delivery_tag=method.delivery_tag)
+        if success:
+            channel.basic_ack(delivery_tag=method.delivery_tag)
+        else:
+            channel.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
 
     def _handle_payment_event(self, channel, method, properties, body) -> None:
         print("+-------------------- testing --------------------+", flush=True)
@@ -104,23 +109,32 @@ class EmailEventConsumer:
             },
         ]
 
+        success = True
         for recipient in recipients:
             html_content = self._build_payment_email_html(message)
-            self._send_email(recipient.get("email"), subject, html_content)
+            if not self._send_email(recipient.get("email"), subject, html_content):
+                success = False
 
-        channel.basic_ack(delivery_tag=method.delivery_tag)
+        if success:
+            channel.basic_ack(delivery_tag=method.delivery_tag)
+        else:
+            channel.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
 
     def _send_email(self, to_email:str, subject: str, html_content: str) -> bool:
-
-        message = Mail(
-            from_email=self._from_email,
-            to_emails=to_email,
-            subject=subject,
-            html_content=html_content,
-        )
-        self._sendgrid.send(message)
-        print(f"[EmailService] Sent '{subject}' to {to_email}", flush=True)
-        return True
+        try:
+            message = Mail(
+                from_email=self._from_email,
+                to_emails=to_email,
+                subject=subject,
+                html_content=html_content,
+            )
+            response = self._sendgrid.send(message)
+            print(f"[EmailService] Sent '{subject}' to {to_email}")
+            return True
+        except Exception as e:
+            print(f"[EmailService] Failed to send '{subject}' to {to_email}: {e}")
+            print(f"[EmailService] Error details - From: {self._from_email}, To: {to_email}, Subject: {subject}")
+            return False
 
     def _build_order_created_email(self, payload: Dict[str, Any], recipient_name: Optional[str]) -> str:
         greeting = recipient_name
