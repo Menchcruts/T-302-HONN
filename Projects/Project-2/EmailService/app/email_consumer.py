@@ -129,6 +129,8 @@ class EmailEventConsumer:
                 html_content=html_content,
             )
             response = self._sendgrid.send(message)
+            print(response.status_code)
+            print(response.body)
             print(f"[EmailService] Sent '{subject}' to {to_email}")
             return True
         except Exception as e:
