@@ -18,36 +18,35 @@ class GatewayService:
 
     async def create_order(self, order_data: Dict[str, Any]) -> int:
         response = await self._post(f"{self.order_service_base_url}/orders", order_data)
-        return response
+        return int(response.text)
     
     async def get_order(self, order_id: int) -> Dict[str, Any]:
         response = await self._get(f"{self.order_service_base_url}/orders/{order_id}")
-        return response
+        return response.json()
 
     async def create_buyer(self, buyer_data: Dict[str, Any]) -> int:
         response = await self._post(f"{self.buyer_service_base_url}/buyers", buyer_data)
-        return response.text
+        return int(response.text)
     
     async def get_buyer(self, buyer_id: int) -> Dict[str, Any]:
         response = await self._get(f"{self.buyer_service_base_url}/buyers/{buyer_id}")
-        return response
+        return response.json()
 
     async def create_merchant(self, merchant_data: Dict[str, Any]) -> int:
         response = await self._post(f"{self.merchant_service_base_url}/merchants", merchant_data)
-        return response
+        return int(response.text)
     
     async def get_merchant(self, merchant_id: int) -> Dict[str, Any]:
         response = await self._get(f"{self.merchant_service_base_url}/merchants/{merchant_id}")
-        return response
+        return response.json()
         
-
     async def create_product(self, product_data: Dict[str, Any]) -> int:
         response = await self._post(f"{self.inventory_service_base_url}/products", product_data)
-        return response
+        return int(response.text)
     
     async def get_product(self, product_id: int) -> Dict[str, Any]:
         response = await self._get(f"{self.inventory_service_base_url}/products/{product_id}")
-        return response
+        return response.json()
 
     async def _get(self, url: str) -> httpx.Response:
         async with httpx.AsyncClient(timeout=self._request_timeout_seconds) as client:
